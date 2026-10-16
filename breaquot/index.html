@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Breaquot · quantum breakout</title>
+  <meta name="description" content="Breaquot: a quantum Breakout where the ball is a wave packet. Beam splitters, phase plates, interference, tunneling and a paddle that measures.">
+  <meta name="theme-color" content="#05040f">
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Press+Start+2P&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="top">
+    <a class="back" href="../">← quantum arcade</a>
+    <h1 class="logo"><span class="bra">|</span>BREAQUOT<span class="ket">⟩</span></h1>
+    <p class="sub">breakout, where the ball is a wave packet</p>
+  </header>
+
+  <main class="app">
+    <section class="stage-col">
+      <div class="hud">
+        <div><span class="lbl">SCORE</span><span id="score" class="val">0</span></div>
+        <div><span class="lbl">LEVEL</span><span id="level" class="val">1</span></div>
+        <div><span class="lbl">LIVES</span><span id="lives" class="val icons"></span></div>
+        <div><span class="lbl">HIGH</span><span id="high" class="val">0</span></div>
+      </div>
+      <div class="stage" id="stage">
+        <canvas id="game" aria-label="Breaquot game board"></canvas>
+        <div id="overlay" class="overlay"></div>
+      </div>
+      <div class="touch" id="touch">
+        <button type="button" data-act="action">LAUNCH / MEASURE</button>
+        <button type="button" data-act="pause">II</button>
+      </div>
+      <div class="hud hud-bottom">
+        <div><span class="lbl">COHERENCE</span><span class="coh-wrap"><span id="coh"></span></span></div>
+        <button id="muteBtn" class="chip" type="button">♪ ON</button>
+      </div>
+    </section>
+
+    <aside class="panel">
+      <h2>State register</h2>
+      <div class="ket-box">
+        <div id="ket" class="ket-text">|ψ⟩ = |ball⟩</div>
+        <div id="probs" class="probs">a definite classical ball</div>
+      </div>
+
+      <h2>Optics on the board</h2>
+      <ul class="legend">
+        <li><span class="gate h">H</span><div><b>Beam splitter</b>: a branch that hits it splits in two. Half the probability bounces back, with its phase flipped (<code>+ → −</code>), and half passes through.</div></li>
+        <li><span class="sym steel">▒</span><div><b>Barrier</b>: steel bounces the ball, but 15% of each branch <b>tunnels</b> through.</div></li>
+        <li><span class="gate z">Z</span><div><b>Phase plate</b>: anything passing through gets its phase flipped. Cyan branches are <code>|+⟩</code> and magenta ones are <code>|−⟩</code>.</div></li>
+        <li><span class="sym">✕</span><div><b>Interference</b>: when two branches meet, they recombine. With the <b>same phase</b>, the merged ball keeps going their way. With <b>opposite phases</b>, it comes out the other way.</div></li>
+        <li><span class="sym num">p</span><div><b>Expected damage</b>: a branch with probability p deals p damage, so splitting covers more bricks with weaker hits.</div></li>
+        <li><span class="sym wave">〰</span><div><b>Entangled bricks</b> come in pairs. Break one and its partner shatters too.</div></li>
+        <li><span class="sym">👁</span><div><b>The paddle is a detector.</b> A branch reaching the bottom is measured: with probability p, it's the real ball. Real and caught: it bounces. Real and missed: you lose a life. Not real: it vanishes, and its probability moves to the other branches.</div></li>
+        <li><span class="sym">⌛</span><div><b>Decoherence</b>: a superposition lasts 12 s, then it collapses on its own. <kbd>Space</kbd> collapses it right away.</div></li>
+      </ul>
+
+      <h2>Controls</h2>
+      <ul class="keys">
+        <li>mouse/touch or <kbd>←</kbd><kbd>→</kbd>/<kbd>A</kbd><kbd>D</kbd> move the paddle</li>
+        <li><kbd>Space</kbd>/click launch · <kbd>Space</kbd> measure</li>
+        <li><kbd>P</kbd> pause · <kbd>M</kbd> mute</li>
+      </ul>
+    </aside>
+  </main>
+
+  <footer>Static page: no build step and no tracking. Plain canvas and JavaScript.</footer>
+  <script src="game.js"></script>
+</body>
+</html>

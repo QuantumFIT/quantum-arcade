@@ -9,6 +9,7 @@ Classic computer games rebuilt around quantum mechanics: superposition, phase fl
 | **Quak-Man** | [`quak-man/`](quak-man/) | Pac-Man: superposed mirrored copies, Z gates that flip ghosts to edible `|−⟩`, entangled ghost pairs, Schrödinger's Clyde, EPR portals, tunneling |
 | **Quetris** | [`quetris/`](quetris/) | Tetris: pieces superposed over two shapes that collapse on contact, `|−⟩` antimatter that annihilates blocks, entangled piece pairs, tunneling |
 | **MineQueeper** | [`minequeeper/`](minequeeper/) | Minesweeper: numbers are expectation values, superposed and entangled mines, anti-mines that count −1, a measurement tool |
+| **Breaquot** | [`breaquot/`](breaquot/) | Breakout: the ball is a wave packet split by beam splitters and steel barriers it can tunnel through, phase plates, interference, a paddle that measures |
 
 Each game's page lists its full rules and controls in a side panel.
 

@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Quak-Man · quantum pac-man</title>
+  <meta name="description" content="Quak-Man: a quantum Pac-Man with superposition, phase flips, entanglement, interference and tunneling. Runs in the browser.">
+  <meta name="theme-color" content="#05040f">
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Press+Start+2P&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="top">
+    <a class="back" href="../">← quantum arcade</a>
+    <h1 class="logo"><span class="bra">|</span>QUAK-MAN<span class="ket">⟩</span></h1>
+    <p class="sub">pac-man, but the particle is quantum</p>
+  </header>
+
+  <main class="app">
+    <section class="stage-col">
+      <div class="hud">
+        <div><span class="lbl">SCORE</span><span id="score" class="val">0</span></div>
+        <div><span class="lbl">HIGH</span><span id="high" class="val">0</span></div>
+        <div><span class="lbl">LEVEL</span><span id="level" class="val">1</span></div>
+      </div>
+      <div class="stage" id="stage">
+        <canvas id="game" aria-label="Quak-Man game board"></canvas>
+        <div id="overlay" class="overlay"></div>
+      </div>
+      <div class="hud hud-bottom">
+        <div><span class="lbl">LIVES</span><span id="lives" class="val icons"></span></div>
+        <div><span class="lbl">TUNNELS</span><span id="tunnels" class="val icons"></span></div>
+        <button id="muteBtn" class="chip" type="button">♪ ON</button>
+      </div>
+      <div class="touch" id="touch">
+        <button type="button" data-act="measure">MEASURE</button>
+        <button type="button" data-act="tunnel">TUNNEL</button>
+        <button type="button" data-act="pause">II</button>
+      </div>
+    </section>
+
+    <aside class="panel">
+      <h2>State register</h2>
+      <div class="ket-box">
+        <div id="ket" class="ket-text">|ψ⟩ = |here⟩</div>
+        <div class="coh" title="coherence remaining"><div id="coh"></div></div>
+        <div id="probs" class="probs">definite position</div>
+      </div>
+
+      <h2>Ghost register</h2>
+      <ul id="ghostList" class="ghosts"></ul>
+
+      <h2>Gates &amp; effects</h2>
+      <ul class="legend">
+        <li><span class="gate h">H</span><div><b>Hadamard</b> splits you into a superposition <code>(|L⟩+|R⟩)/√2</code>: two copies, mirrored across the maze. The mirror copy moves with mirrored controls, and both copies eat. A second H interferes you back, since <code>H·H = I</code>.</div></li>
+        <li><span class="gate z">Z</span><div><b>Phase flip</b> takes ghosts from <code>|+⟩</code> to <code>|−⟩</code>, and <code>|−⟩</code> ghosts are edible. But Z flips <code>|−⟩</code> back to <code>|+⟩</code> too, so don't take two in a row.</div></li>
+        <li><span class="sym">✕</span><div><b>Interference</b>: when a <code>|+⟩</code> ghost and a <code>|−⟩</code> ghost meet, they cancel out.</div></li>
+        <li><span class="sym wave">〰</span><div><b>Entanglement</b>: ghosts come in Bell pairs. Eat one and its partner collapses too.</div></li>
+        <li><span class="sym">?</span><div><b>Schrödinger's Clyde</b> is in two places at once until you observe him (line of sight).</div></li>
+        <li><span class="sym ring">◎</span><div><b>EPR portals</b>: opposite corners are entangled.</div></li>
+        <li><span class="sym">⇥</span><div><b>Tunneling</b>: go through a wall with probability <code>e<sup>−0.6·w</sup></code>, where w is the wall thickness.</div></li>
+        <li><span class="sym">👁</span><div><b>Measurement</b>: when a ghost touches one of your copies, the wavefunction collapses. With 50% chance you were never there.</div></li>
+      </ul>
+
+      <h2>Controls</h2>
+      <ul class="keys">
+        <li><kbd>←↑↓→</kbd>/<kbd>WASD</kbd> move · swipe on touch</li>
+        <li><kbd>Space</kbd> measure (collapse now)</li>
+        <li><kbd>T</kbd> quantum tunnel</li>
+        <li><kbd>P</kbd> pause · <kbd>M</kbd> mute</li>
+      </ul>
+    </aside>
+  </main>
+
+  <footer>Static page: no build step and no tracking. Plain canvas and JavaScript.</footer>
+  <script src="game.js"></script>
+</body>
+</html>

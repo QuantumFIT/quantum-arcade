@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Quetris · quantum tetris</title>
+  <meta name="description" content="Quetris: a quantum Tetris with superposed pieces, phase-flipped antimatter blocks, entangled pairs, measurement and tunneling.">
+  <meta name="theme-color" content="#05040f">
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Press+Start+2P&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="top">
+    <a class="back" href="../">← quantum arcade</a>
+    <h1 class="logo"><span class="bra">|</span>QUETRIS<span class="ket">⟩</span></h1>
+    <p class="sub">tetris, but every piece is a wavefunction</p>
+  </header>
+
+  <main class="app">
+    <section class="stage-col">
+      <div class="hud">
+        <div><span class="lbl">SCORE</span><span id="score" class="val">0</span></div>
+        <div><span class="lbl">LINES</span><span id="lines" class="val">0</span></div>
+        <div><span class="lbl">LEVEL</span><span id="level" class="val">1</span></div>
+        <div><span class="lbl">HIGH</span><span id="high" class="val">0</span></div>
+      </div>
+      <div class="stage" id="stage">
+        <canvas id="game" aria-label="Quetris game board"></canvas>
+        <div id="overlay" class="overlay"></div>
+      </div>
+      <div class="hud hud-bottom">
+        <div><span class="lbl">Z FLIPS</span><span id="flips" class="val icons mag"></span></div>
+        <div><span class="lbl">TUNNELS</span><span id="tunnels" class="val icons"></span></div>
+        <button id="muteBtn" class="chip" type="button">♪ ON</button>
+      </div>
+      <div class="touch" id="touch">
+        <button type="button" data-act="left">◀</button>
+        <button type="button" data-act="rotate">⟳</button>
+        <button type="button" data-act="right">▶</button>
+        <button type="button" data-act="soft">▼</button>
+        <button type="button" data-act="drop">⤓</button>
+        <button type="button" data-act="hold">HOLD</button>
+        <button type="button" data-act="flip" class="q">Z</button>
+        <button type="button" data-act="measure" class="q">MEAS</button>
+        <button type="button" data-act="tunnel" class="q">TUN</button>
+        <button type="button" data-act="pause">II</button>
+      </div>
+    </section>
+
+    <aside class="panel">
+      <h2>State register</h2>
+      <div class="ket-box">
+        <div id="ket" class="ket-text">|ψ⟩ = |T⟩</div>
+        <div id="probs" class="probs">definite shape</div>
+      </div>
+
+      <h2>Quantum rules</h2>
+      <ul class="legend">
+        <li><span class="sym sup">⊕</span><div><b>Superposed pieces</b> are two shapes at once, e.g. <code>(|T⟩+|S⟩)/√2</code>. A move only works if both shapes fit. When either shape touches down, the piece is measured: 50/50 which one becomes real.</div></li>
+        <li><span class="gate z">Z</span><div><b>Phase flip</b> (<kbd>F</kbd>) turns the piece into <code>|−⟩</code> antimatter. A cell that lands on a cell of the opposite phase annihilates with it: <code>|+⟩+|−⟩ → 0</code>. Use it to dig out holes.</div></li>
+        <li><span class="sym wave">〰</span><div><b>Entangled pairs</b>: two consecutive pieces share a Bell pair. Clear any of their cells and every other cell of the pair vanishes too.</div></li>
+        <li><span class="sym">👁</span><div><b>Measure</b> (<kbd>Q</kbd>) collapses a superposed piece right now.</div></li>
+        <li><span class="sym">⇣</span><div><b>Tunneling</b> (<kbd>T</kbd>): the piece passes through blocks to the next free spot below, with probability <code>e<sup>−0.6·w</sup></code> for w rows of blocks.</div></li>
+        <li><span class="sym">+</span><div>You get +1 Z flip and +1 tunnel every 5 cleared lines (5 at most).</div></li>
+      </ul>
+
+      <h2>Controls</h2>
+      <ul class="keys">
+        <li><kbd>←</kbd><kbd>→</kbd> move · <kbd>↓</kbd> soft drop · <kbd>Space</kbd> hard drop</li>
+        <li><kbd>↑</kbd>/<kbd>X</kbd> rotate ⟳ · <kbd>Z</kbd> rotate ⟲ · <kbd>C</kbd> hold</li>
+        <li><kbd>F</kbd> phase flip · <kbd>Q</kbd> measure · <kbd>T</kbd> tunnel</li>
+        <li><kbd>P</kbd> pause · <kbd>M</kbd> mute</li>
+      </ul>
+    </aside>
+  </main>
+
+  <footer>Static page: no build step and no tracking. Plain canvas and JavaScript.</footer>
+  <script src="game.js"></script>
+</body>
+</html>

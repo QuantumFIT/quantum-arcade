@@ -30,9 +30,18 @@ body {
 }
 
 .top {
+  position: relative;
   text-align: center;
   padding: 18px 16px 4px;
 }
+.back {
+  display: inline-block;
+  margin-bottom: 8px;
+  color: var(--muted);
+  font-size: 12px;
+  text-decoration: none;
+}
+.back:hover { color: var(--cyan); }
 
 .logo {
   margin: 0;
@@ -65,7 +74,7 @@ body {
 }
 
 .stage-col {
-  width: min(560px, calc(100vw - 32px), calc((100svh - 190px) * 28 / 31));
+  width: min(540px, calc(100vw - 32px), calc((100svh - 190px) * 6 / 7));
   min-width: 280px;
 }
 
@@ -83,8 +92,10 @@ body {
 .val { font-size: 14px; color: var(--text); min-height: 14px; }
 .icons { color: var(--yellow); letter-spacing: 3px; }
 #tunnels { color: var(--cyan); }
+.icons.mag { color: var(--magenta); }
 
 .chip {
+  white-space: nowrap;
   font-family: var(--pixel);
   font-size: 9px;
   color: var(--muted);
@@ -99,7 +110,7 @@ body {
 .stage {
   position: relative;
   width: 100%;
-  aspect-ratio: 28 / 31;
+  aspect-ratio: 6 / 7;
   border-radius: 10px;
   overflow: hidden;
   box-shadow: 0 0 0 1px var(--line), 0 20px 60px rgba(40, 20, 140, .35);
@@ -192,7 +203,7 @@ body {
 .gate.z { color: #04030c; background: var(--magenta); box-shadow: 0 0 10px rgba(255, 79, 216, .6); }
 .sym { color: var(--text); border: 1px solid var(--line); font-size: 12px; }
 .sym.wave { color: #ffb0d8; }
-.sym.ring { color: var(--cyan); }
+.sym.sup { color: var(--cyan); }
 
 .panel {
   width: min(360px, calc(100vw - 32px));
@@ -244,7 +255,7 @@ kbd {
   padding: 1px 5px;
 }
 
-.touch { display: none; gap: 8px; margin-top: 8px; }
+.touch { display: none; grid-template-columns: repeat(5, 1fr); gap: 6px; margin-top: 8px; }
 .touch button {
   flex: 1;
   font-family: var(--pixel);
@@ -256,9 +267,9 @@ kbd {
   padding: 14px 6px;
 }
 .touch button:active { background: #241e5c; }
-.touch button[data-act="pause"] { flex: 0 0 52px; }
+.touch button.q { color: var(--magenta); }
 @media (pointer: coarse) {
-  .touch { display: flex; }
+  .touch { display: grid; }
 }
 
 footer {

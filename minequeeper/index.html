@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>MineQueeper · quantum minesweeper</title>
+  <meta name="description" content="MineQueeper: a quantum Minesweeper with superposed mines, entangled pairs, anti-mines with negative phase, and measurement.">
+  <meta name="theme-color" content="#05040f">
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Press+Start+2P&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="top">
+    <a class="back" href="../">← quantum arcade</a>
+    <h1 class="logo"><span class="bra">|</span>MINEQUEEPER<span class="ket">⟩</span></h1>
+    <p class="sub">minesweeper, where some mines are only probably there</p>
+  </header>
+
+  <main class="app">
+    <section class="stage-col" id="stageCol">
+      <div class="toolbar">
+        <div class="seg" id="diffs">
+          <button type="button" data-diff="easy">EASY</button>
+          <button type="button" data-diff="normal">NORMAL</button>
+          <button type="button" data-diff="hard">HARD</button>
+        </div>
+        <button type="button" class="chip" id="newBtn">NEW |ψ⟩</button>
+      </div>
+      <div class="hud">
+        <div><span class="lbl">EXP. MINES</span><span id="mines" class="val">0</span></div>
+        <div><span class="lbl">TIME</span><span id="time" class="val">0</span></div>
+        <div><span class="lbl">MEASUREMENTS</span><span id="measures" class="val icons"></span></div>
+        <div><span class="lbl">BEST</span><span id="best" class="val">–</span></div>
+      </div>
+      <div id="status" class="status">Click any cell to start. Your first click is always safe.</div>
+      <div class="stage" id="stage">
+        <canvas id="game" aria-label="MineQueeper board"></canvas>
+      </div>
+      <div class="hud hud-bottom">
+        <div class="seg" id="modes">
+          <button type="button" data-mode="reveal" class="on">⛏ REVEAL</button>
+          <button type="button" data-mode="flag">⚑ FLAG</button>
+          <button type="button" data-mode="measure">👁 MEASURE</button>
+        </div>
+        <button id="muteBtn" class="chip" type="button">♪ ON</button>
+      </div>
+    </section>
+
+    <aside class="panel">
+      <h2>Quantum mines</h2>
+      <ul class="legend">
+        <li><span class="sym num">2</span><div><b>Numbers are expectation values.</b> Each counts the mines expected in the 8 neighbouring cells: <code>⟨n⟩ = Σ P(mine)·phase</code>.</div></li>
+        <li><span class="sym sup">½</span><div><b>Superposed mine</b> <code>(|10⟩+|01⟩)/√2</code>: one mine spread over two nearby cells, so it adds ½ to the numbers around each. A <code>½</code> in a number means a superposition is next to it.</div></li>
+        <li><span class="sym wave">〰</span><div><b>Entangled pair</b> <code>(|00⟩+|11⟩)/√2</code>: two cells a short distance apart that are both mines or both safe. Reveal one safely and its partner opens too (spooky action).</div></li>
+        <li><span class="gate z">−</span><div><b>Anti-mine</b> with phase <code>|−⟩</code>: it explodes all the same but counts <b>−1</b>. A shown <code>0</code> means the mines around cancel out. Only a blank cell is truly empty.</div></li>
+        <li><span class="sym">👁</span><div><b>Measure</b> collapses a cell's superposition without revealing it. The numbers around it become whole again, so you can deduce as usual. Measuring a classical cell uses up the measurement.</div></li>
+        <li><span class="sym">⛏</span><div><b>Revealing an unmeasured quantum cell</b> measures it the hard way: a 50/50 gamble.</div></li>
+        <li><span class="sym">✓</span><div><b>To win</b>, reveal every safe cell. Every superposition must have collapsed by then.</div></li>
+      </ul>
+
+      <h2>Controls</h2>
+      <ul class="keys">
+        <li><kbd>click</kbd> reveal · <kbd>right-click</kbd> flag</li>
+        <li><kbd>Shift</kbd>+<kbd>click</kbd> or <kbd>middle-click</kbd> measure</li>
+        <li><kbd>click</kbd> a number with matching flags to open its neighbours</li>
+        <li>touch: pick a mode below the board · long-press to flag</li>
+        <li><kbd>N</kbd> new game · <kbd>1</kbd><kbd>2</kbd><kbd>3</kbd> difficulty · <kbd>M</kbd> mute</li>
+      </ul>
+    </aside>
+  </main>
+
+  <footer>Static page: no build step and no tracking. Plain canvas and JavaScript.</footer>
+  <script src="game.js"></script>
+</body>
+</html>

@@ -28,4 +28,4 @@ python3 -m http.server 8000   # then open http://localhost:8000
 
 ## Deploying to GitHub Pages
 
-In the repository settings, go to **Settings → Pages → Build and deployment**. Choose **Deploy from a branch**, then pick `master` and `/ (root)`. The site will be published at <https://ondrik.github.io/Quak-Man/>.
+In the repository settings, go to **Settings → Pages → Build and deployment**. Choose **Deploy from a branch**, then pick `master` and `/ (root)`. The site will be published at <https://ondrik.github.io/quantum-arcade/>.

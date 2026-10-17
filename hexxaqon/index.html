@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Hexxaqon · quantum hexxagon</title>
+  <meta name="description" content="Hexxaqon: a quantum Hexxagon. Clone, jump, split pieces into superposition, entangle them and shield them with a phase flip, against the computer or a friend.">
+  <meta name="theme-color" content="#05040f">
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Press+Start+2P&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="top">
+    <a class="back" href="../">← quantum arcade</a>
+    <h1 class="logo"><span class="bra">|</span>HEXXAQON<span class="ket">⟩</span></h1>
+    <p class="sub">hexxagon, where a piece can be in two places at once</p>
+  </header>
+
+  <main class="app">
+    <section class="stage-col">
+      <div class="toolbar">
+        <div class="seg" id="opps">
+          <button type="button" data-opp="easy">AI EASY</button>
+          <button type="button" data-opp="hard">AI HARD</button>
+          <button type="button" data-opp="human">2 PLAYERS</button>
+        </div>
+        <button type="button" class="chip" id="newBtn">NEW |ψ⟩</button>
+      </div>
+      <div class="hud">
+        <div><span class="lbl" id="name0">YOU</span><span id="count0" class="val p0">3</span></div>
+        <div class="turn"><span class="lbl">TURN</span><span id="turn" class="val">YOU</span></div>
+        <div class="right"><span class="lbl" id="name1">AI</span><span id="count1" class="val p1">3</span></div>
+      </div>
+      <div id="status" class="status">Select one of your pieces.</div>
+      <div class="stage" id="stage">
+        <canvas id="game" aria-label="Hexxaqon board"></canvas>
+      </div>
+      <div class="moves">
+        <div class="seg" id="modes">
+          <button type="button" data-mode="classic" class="on">● CLASSIC</button>
+          <button type="button" data-mode="split">H SPLIT <span id="chH"></span></button>
+          <button type="button" data-mode="entangle">〰 ENTANGLE <span id="chE"></span></button>
+        </div>
+        <button type="button" id="zBtn" class="zbtn">Z SHIELD <span id="chZ"></span></button>
+        <button id="muteBtn" class="chip" type="button">♪ ON</button>
+      </div>
+    </section>
+
+    <aside class="panel">
+      <h2>How to play</h2>
+      <ul class="legend">
+        <li><span class="sym num">●</span><div><b>Classic Hexxagon.</b> Select a piece. You can <b>clone</b> it to an adjacent cell (green) or <b>jump</b> it two cells away (amber), which leaves the original cell empty. Opposing pieces next to where you land become yours. When the board is full or nobody can move, whoever has more pieces wins.</div></li>
+        <li><span class="gate h">H</span><div><b>Split</b> (3 per game): the piece jumps into <code>(|A⟩+|B⟩)/√2</code>, two cells within reach that count ½ each. A superposed piece can't move, can't be captured, and captures nothing until it collapses.</div></li>
+        <li><span class="sym">👁</span><div><b>Measurement</b>: a piece of either colour that lands next to a superposed piece collapses it 50/50. The collapsed piece captures its neighbours first, and that can include the piece that observed it. Collapses can cascade.</div></li>
+        <li><span class="sym">✕</span><div><b>Interference</b>: land next to <i>both</i> halves of a superposed piece at once and it annihilates completely.</div></li>
+        <li><span class="sym wave">〰</span><div><b>Entangle</b> (3 per game): a clone that reaches two cells away. The original and the copy share their fate: when one is captured, the other flips too, and then the link breaks.</div></li>
+        <li><span class="gate z">Z</span><div><b>Shield</b> (2 per game): put the piece you move in <code>|−⟩</code>. The next capture only flips its phase back to <code>|+⟩</code>, so it stays yours.</div></li>
+        <li><span class="sym">⌛</span><div>When the game ends, every remaining superposition is measured before the pieces are counted.</div></li>
+      </ul>
+
+      <h2>Controls</h2>
+      <ul class="keys">
+        <li><kbd>click</kbd> a piece, then <kbd>click</kbd> a destination</li>
+        <li><kbd>H</kbd> split · <kbd>E</kbd> entangle · <kbd>C</kbd> classic · <kbd>Z</kbd> shield</li>
+        <li><kbd>Esc</kbd> deselect · <kbd>N</kbd> new game · <kbd>M</kbd> mute</li>
+      </ul>
+    </aside>
+  </main>
+
+  <footer>Static page: no build step and no tracking. Plain canvas and JavaScript.</footer>
+  <script src="game.js"></script>
+</body>
+</html>

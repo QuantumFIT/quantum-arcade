@@ -11,6 +11,7 @@ Classic computer games rebuilt around quantum mechanics: superposition, phase fl
 | **MineQueeper** | [`minequeeper/`](minequeeper/) | Minesweeper: numbers are expectation values, superposed and entangled mines, anti-mines that count −1, a measurement tool |
 | **Breaquot** | [`breaquot/`](breaquot/) | Breakout: the ball is a wave packet split by beam splitters and steel barriers it can tunnel through, phase plates, interference, a paddle that measures |
 | **Hexxaqon** | [`hexxaqon/`](hexxaqon/) | Hexxagon: pieces split into superpositions that collapse when observed (and capture on landing), interference, entangled clones, Z-shields; vs. an expectation-value AI or a friend |
+| **Lights Qout** | [`lights-qout/`](lights-qout/) | Lights Out logic puzzle: every cell is a qubit in `|0⟩ |1⟩ |+⟩ |−⟩`; X and Z presses act on crosses, Hadamards on single cells; 16 levels plus endless random puzzles |
 
 Each game's page lists its full rules and controls in a side panel.
 

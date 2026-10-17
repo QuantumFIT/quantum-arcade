@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Lights Qout · quantum lights out</title>
+  <meta name="description" content="Lights Qout: a quantum Lights Out logic puzzle. Every cell is a qubit; use X, Z and Hadamard gates to bring the whole grid to |0⟩.">
+  <meta name="theme-color" content="#05040f">
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Press+Start+2P&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="top">
+    <a class="back" href="../">← quantum arcade</a>
+    <h1 class="logo"><span class="bra">|</span>LIGHTS QOUT<span class="ket">⟩</span></h1>
+    <p class="sub">lights out, where every light is a qubit</p>
+  </header>
+
+  <main class="app">
+    <section class="stage-col">
+      <div class="toolbar">
+        <div class="seg">
+          <button type="button" id="levelsBtn">LEVELS</button>
+          <button type="button" id="prevBtn">◀</button>
+          <button type="button" id="nextBtn">▶</button>
+        </div>
+        <div class="seg">
+          <button type="button" id="undoBtn">UNDO</button>
+          <button type="button" id="resetBtn">RESET</button>
+        </div>
+      </div>
+      <div class="hud">
+        <div><span class="lbl">LEVEL</span><span id="level" class="val">1</span></div>
+        <div><span class="lbl">MOVES</span><span id="moves" class="val">0</span></div>
+        <div><span class="lbl">PAR</span><span id="par" class="val">0</span></div>
+        <div class="right"><span class="lbl">H LEFT</span><span id="hleft" class="val hcount">0</span></div>
+      </div>
+      <div id="status" class="status">Bring every qubit to |0⟩, with all arrows pointing up.</div>
+      <div class="stage" id="stage">
+        <canvas id="game" aria-label="Lights Qout board"></canvas>
+        <div id="overlay" class="overlay"></div>
+      </div>
+      <div class="moves">
+        <div class="seg" id="tools">
+          <button type="button" data-tool="X" class="on">X PRESS</button>
+          <button type="button" data-tool="Z">Z PRESS</button>
+          <button type="button" data-tool="H">H GATE</button>
+        </div>
+        <button id="muteBtn" class="chip" type="button">♪ ON</button>
+      </div>
+    </section>
+
+    <aside class="panel">
+      <h2>The gates</h2>
+      <ul class="legend">
+        <li><span class="gate x">X</span><div><b>X press</b> acts on the cell and its 4 neighbours. It swaps <code>|0⟩ ↔ |1⟩</code> and leaves <code>|+⟩</code> and <code>|−⟩</code> alone, since <code>X|±⟩ = ±|±⟩</code> is the same state up to a global phase.</div></li>
+        <li><span class="gate z">Z</span><div><b>Z press</b> acts on the same cross. It swaps <code>|+⟩ ↔ |−⟩</code> and leaves <code>|0⟩</code> and <code>|1⟩</code> alone.</div></li>
+        <li><span class="gate h">H</span><div><b>Hadamard</b> acts on a single cell. It swaps <code>|0⟩ ↔ |+⟩</code> and <code>|1⟩ ↔ |−⟩</code>, which moves the qubit between the X and Z puzzles. You only get as many as the level needs.</div></li>
+      </ul>
+
+      <h2>Reading the dials</h2>
+      <ul class="legend dials">
+        <li><span class="dial d0"></span><div><code>|0⟩</code> points up. This is the goal.</div></li>
+        <li><span class="dial d1"></span><div><code>|1⟩</code> points down: the light is on.</div></li>
+        <li><span class="dial dp"></span><div><code>|+⟩</code> points right, on the equator.</div></li>
+        <li><span class="dial dm"></span><div><code>|−⟩</code> points left, on the equator.</div></li>
+      </ul>
+      <p class="note">Each dial is a Bloch sphere seen from the side. Gates rotate the arrow the same way the real gate rotates the qubit.</p>
+
+      <h2>Hints</h2>
+      <ul class="keys">
+        <li>X presses can't touch a <code>|±⟩</code> cell, and Z presses can't touch <code>|0⟩</code>/<code>|1⟩</code>. That gives you two separate puzzles.</li>
+        <li>Each <code>|±⟩</code> cell needs exactly one H to come home. Choose whether to fix its phase before the H or its bit after it.</li>
+        <li>🔒 locked cells can't be pressed, but presses on their neighbours still reach them.</li>
+      </ul>
+
+      <h2>Controls</h2>
+      <ul class="keys">
+        <li><kbd>click</kbd> apply the selected gate · <kbd>X</kbd> <kbd>Z</kbd> <kbd>H</kbd> pick a gate</li>
+        <li><kbd>U</kbd> undo · <kbd>R</kbd> reset · <kbd>N</kbd>/<kbd>P</kbd> next/previous level · <kbd>M</kbd> mute</li>
+      </ul>
+    </aside>
+  </main>
+
+  <footer>Static page: no build step and no tracking. Plain canvas and JavaScript.</footer>
+  <script src="game.js"></script>
+</body>
+</html>

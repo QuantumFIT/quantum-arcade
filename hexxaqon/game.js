@@ -8,6 +8,11 @@
  * ghost id g when the piece is one half of a superposition.
  */
 (() => {
+  const t = (s, v) => (window.QA ? QA.t(s, v) : String(s).replace(/\{(\w+)\}/g, (m, k) => (v && k in v ? v[k] : m)));
+  // A status message: a key plus placeholder values (functions are evaluated
+  // when the message is shown, so names follow the current language).
+  const M = (k, v) => ({ k, v });
+
   // ---------------------------------------------------------- geometry --
   const RADIUS = 4;
   const HOLES = new Set(['1,0', '0,-1', '-1,1']);
@@ -376,14 +381,15 @@
   if (!['easy', 'hard', 'human'].includes(opp)) opp = 'easy';
 
   const isAI = p => opp !== 'human' && p === 1;
-  const name = p => (opp === 'human' ? (p ? 'AMBER' : 'CYAN') : (p ? 'AI' : 'YOU'));
+  const name = p => t(opp === 'human' ? (p ? 'AMBER' : 'CYAN') : (p ? 'AI' : 'YOU'));
+  const toMove = () => (opp === 'human' ? M('{who} to move. Select a piece.', { who: () => name(S.turn) }) : 'You to move. Select a piece.');
 
   function newGame() {
     S = initialState();
     selected = -1; splitFirst = -1; mode = 'classic'; zOn = false;
     thinking = false; lastMove = null;
     anims.length = 0; particles.length = 0; popups.length = 0;
-    setStatus(`${opp === 'human' ? 'CYAN' : 'You'} to move. Select a piece.`);
+    setStatus(toMove());
     syncButtons();
   }
 
@@ -424,7 +430,7 @@
           msg = 'Interference: both halves were observed at once, and the piece annihilated.';
           break;
         case 'split': burst(e.a, COLORS[e.p], 8); burst(e.b, COLORS[e.p], 8); sfx.split(); break;
-        case 'pass': msg = `${name(e.p)} cannot move and passes.`; break;
+        case 'pass': { const p = e.p; msg = M('{who} cannot move and passes.', { who: () => name(p) }); break; }
         case 'move': lastMove = e.m; break;
       }
     }
@@ -446,18 +452,21 @@
     syncButtons();
     if (S.over) {
       const a = pieceCount(S, 0), b = pieceCount(S, 1);
-      const verdict = a === b ? 'Draw' : opp === 'human' ? `${a > b ? 'CYAN' : 'AMBER'} wins` : a > b ? 'You win' : 'The AI wins';
-      setStatus(`${verdict}, ${a}–${b}. Press N for a new game.`, a > b || opp === 'human' ? 'win' : 'lose');
+      const fmt = v => (v % 1 ? Math.floor(v) + '½' : String(v));
+      const v = { a: fmt(a), b: fmt(b) };
+      const verdict = a === b ? M('Draw, {a}–{b}. Press N for a new game.', v)
+        : opp === 'human' ? M('{who} wins, {a}–{b}. Press N for a new game.', { ...v, who: () => name(a > b ? 0 : 1) })
+          : a > b ? M('You win, {a}–{b}. Press N for a new game.', v) : M('The AI wins, {a}–{b}. Press N for a new game.', v);
+      setStatus(verdict, a > b || opp === 'human' ? 'win' : 'lose');
       if (opp !== 'human' && b > a) sfx.lose(); else sfx.win();
       return;
     }
-    const who = name(S.turn);
     if (isAI(S.turn)) {
-      setStatus((msg ? msg + ' ' : '') + 'The AI is thinking…');
+      setStatus(msg ? [msg, 'The AI is thinking…'] : 'The AI is thinking…');
       thinking = true;
       setTimeout(aiMove, 450);
     } else {
-      setStatus(msg || `${opp === 'human' ? who : 'You'} to move. Select a piece.`);
+      setStatus(msg || toMove());
     }
   }
 
@@ -469,8 +478,13 @@
     const log = [];
     applyMove(S, m, Math.random, log);
     let msg = playLog(log);
-    const verb = { c: 'cloned', j: 'jumped', e: 'made an entangled clone', s: 'split a piece into superposition' }[m.type];
-    msg = msg || `The AI ${verb}${m.z ? ' with a Z shield' : ''}.`;
+    const said = {
+      c: ['The AI cloned.', 'The AI cloned with a Z shield.'],
+      j: ['The AI jumped.', 'The AI jumped with a Z shield.'],
+      e: ['The AI made an entangled clone.', 'The AI made an entangled clone with a Z shield.'],
+      s: ['The AI split a piece into superposition.', 'The AI split a piece into superposition.'],
+    }[m.type][m.z ? 1 : 0];
+    msg = msg || said;
     afterTurn(msg);
   }
 
@@ -504,10 +518,10 @@
   }
 
   function hint() {
-    if (selected < 0) { setStatus(`${opp === 'human' ? name(S.turn) : 'You'} to move. Select a piece.`); return; }
-    if (mode === 'classic') setStatus('Green cells: clone. Amber cells: jump.' + (zOn ? ' The new piece will be shielded (|−⟩).' : ''));
+    if (selected < 0) { setStatus(toMove()); return; }
+    if (mode === 'classic') setStatus(zOn ? ['Green cells: clone. Amber cells: jump.', 'The new piece will be shielded (|−⟩).'] : 'Green cells: clone. Amber cells: jump.');
     if (mode === 'split') setStatus('Split: pick two cells within reach. The piece will be ½ in each.');
-    if (mode === 'entangle') setStatus('Entangle: clone to an amber cell. The two pieces will share their fate.' + (zOn ? ' The clone will be shielded.' : ''));
+    if (mode === 'entangle') setStatus(zOn ? ['Entangle: clone to an amber cell. The two pieces will share their fate.', 'The clone will be shielded.'] : 'Entangle: clone to an amber cell. The two pieces will share their fate.');
   }
 
   function setMode(m) {
@@ -526,9 +540,21 @@
 
   const $ = id => document.getElementById(id);
   const statusEl = $('status');
-  function setStatus(text, cls = '') {
-    statusEl.textContent = text;
-    statusEl.className = 'status' + (cls ? ' ' + cls : '');
+  // Status parts are plain keys or M(key, vars); kept so a language switch
+  // can re-render the current line.
+  let lastStatus = { parts: [], cls: '' };
+  function setStatus(parts, cls = '') {
+    lastStatus = { parts: Array.isArray(parts) ? parts : [parts], cls };
+    renderStatus();
+  }
+  function renderStatus() {
+    statusEl.textContent = lastStatus.parts.map(p => {
+      if (typeof p === 'string') return t(p);
+      const v = {};
+      for (const k in p.v || {}) v[k] = typeof p.v[k] === 'function' ? p.v[k]() : p.v[k];
+      return t(p.k, v);
+    }).join(' ');
+    statusEl.className = 'status' + (lastStatus.cls ? ' ' + lastStatus.cls : '');
   }
   function syncButtons() {
     const ch = S.charges[S.turn];
@@ -569,9 +595,10 @@
   const muteBtn = $('muteBtn');
   function toggleMute() {
     muted = !muted;
-    muteBtn.textContent = muted ? '♪ OFF' : '♪ ON';
+    muteBtn.textContent = t(muted ? '♪ OFF' : '♪ ON');
     try { localStorage.setItem('hexxaqon-muted', muted ? '1' : '0'); } catch (e) { /* ignore */ }
   }
+  muteBtn.textContent = t('♪ ON');
   try { if (localStorage.getItem('hexxaqon-muted') === '1') toggleMute(); } catch (e) { /* ignore */ }
   muteBtn.addEventListener('click', () => { toggleMute(); muteBtn.blur(); });
 
@@ -732,7 +759,7 @@
     for (const p of popups) {
       ctx.globalAlpha = Math.max(0, 1 - (p.t / p.life) ** 2);
       ctx.fillStyle = p.color;
-      ctx.fillText(p.text, Math.max(60, Math.min(W - 60, p.x)), p.y - p.t * 20);
+      ctx.fillText(t(p.text), Math.max(60, Math.min(W - 60, p.x)), p.y - p.t * 20);
     }
     ctx.restore();
   }
@@ -740,11 +767,20 @@
   function updateHUD() {
     const a = pieceCount(S, 0), b = pieceCount(S, 1);
     const fmt = v => (v % 1 ? Math.floor(v) + '½' : String(v));
-    const c0 = $('count0'), c1 = $('count1'), t = $('turn');
+    const c0 = $('count0'), c1 = $('count1'), turnEl = $('turn');
     if (c0._v !== a) { c0._v = a; c0.textContent = fmt(a); }
     if (c1._v !== b) { c1._v = b; c1.textContent = fmt(b); }
-    const tv = S.over ? 'END' : name(S.turn);
-    if (t._v !== tv) { t._v = tv; t.textContent = tv; t.className = 'val ' + (S.over ? '' : 'p' + S.turn); }
+    const tv = S.over ? t('END') : name(S.turn);
+    if (turnEl._v !== tv) { turnEl._v = tv; turnEl.textContent = tv; turnEl.className = 'val ' + (S.over ? '' : 'p' + S.turn); }
+  }
+
+  if (window.QA) {
+    QA.onChange(() => {
+      renderStatus();
+      syncButtons();
+      muteBtn.textContent = t(muted ? '♪ OFF' : '♪ ON');
+      $('turn')._v = null;
+    });
   }
 
   // -------------------------------------------------------------- loop --

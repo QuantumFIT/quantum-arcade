@@ -14,78 +14,80 @@
 </head>
 <body>
   <header class="top">
-    <a class="back" href="../">← quantum arcade</a>
+    <a class="back" href="../" data-i18n="lq.back">← quantum arcade</a>
     <h1 class="logo"><span class="bra">|</span>LIGHTS QOUT<span class="ket">⟩</span></h1>
-    <p class="sub">lights out, where every light is a qubit</p>
+    <p class="sub" data-i18n="lq.sub">lights out, where every light is a qubit</p>
   </header>
 
   <main class="app">
     <section class="stage-col">
       <div class="toolbar">
         <div class="seg">
-          <button type="button" id="levelsBtn">LEVELS</button>
+          <button type="button" id="levelsBtn" data-i18n="lq.levels">LEVELS</button>
           <button type="button" id="prevBtn">◀</button>
           <button type="button" id="nextBtn">▶</button>
         </div>
         <div class="seg">
-          <button type="button" id="undoBtn">UNDO</button>
-          <button type="button" id="resetBtn">RESET</button>
+          <button type="button" id="undoBtn" data-i18n="lq.undo">UNDO</button>
+          <button type="button" id="resetBtn" data-i18n="lq.reset">RESET</button>
         </div>
       </div>
       <div class="hud">
-        <div><span class="lbl">LEVEL</span><span id="level" class="val">1</span></div>
-        <div><span class="lbl">MOVES</span><span id="moves" class="val">0</span></div>
-        <div><span class="lbl">PAR</span><span id="par" class="val">0</span></div>
-        <div class="right"><span class="lbl">H LEFT</span><span id="hleft" class="val hcount">0</span></div>
+        <div><span class="lbl" data-i18n="lq.level">LEVEL</span><span id="level" class="val">1</span></div>
+        <div><span class="lbl" data-i18n="lq.moves">MOVES</span><span id="moves" class="val">0</span></div>
+        <div><span class="lbl" data-i18n="lq.par">PAR</span><span id="par" class="val">0</span></div>
+        <div class="right"><span class="lbl" data-i18n="lq.hleft">H LEFT</span><span id="hleft" class="val hcount">0</span></div>
       </div>
       <div id="status" class="status">Bring every qubit to |0⟩, with all arrows pointing up.</div>
       <div class="stage" id="stage">
-        <canvas id="game" aria-label="Lights Qout board"></canvas>
+        <canvas id="game" aria-label="Lights Qout board" data-i18n-aria="lq.aria"></canvas>
         <div id="overlay" class="overlay"></div>
       </div>
       <div class="moves">
         <div class="seg" id="tools">
-          <button type="button" data-tool="X" class="on">X PRESS</button>
-          <button type="button" data-tool="Z">Z PRESS</button>
-          <button type="button" data-tool="H">H GATE</button>
+          <button type="button" data-tool="X" class="on" data-i18n="lq.tool.x">X PRESS</button>
+          <button type="button" data-tool="Z" data-i18n="lq.tool.z">Z PRESS</button>
+          <button type="button" data-tool="H" data-i18n="lq.tool.h">H GATE</button>
         </div>
         <button id="muteBtn" class="chip" type="button">♪ ON</button>
       </div>
     </section>
 
     <aside class="panel">
-      <h2>The gates</h2>
+      <h2 data-i18n="lq.h.gates">The gates</h2>
       <ul class="legend">
-        <li><span class="gate x">X</span><div><b>X press</b> acts on the cell and its 4 neighbours. It swaps <code>|0⟩ ↔ |1⟩</code> and leaves <code>|+⟩</code> and <code>|−⟩</code> alone, since <code>X|±⟩ = ±|±⟩</code> is the same state up to a global phase.</div></li>
-        <li><span class="gate z">Z</span><div><b>Z press</b> acts on the same cross. It swaps <code>|+⟩ ↔ |−⟩</code> and leaves <code>|0⟩</code> and <code>|1⟩</code> alone.</div></li>
-        <li><span class="gate h">H</span><div><b>Hadamard</b> acts on a single cell. It swaps <code>|0⟩ ↔ |+⟩</code> and <code>|1⟩ ↔ |−⟩</code>, which moves the qubit between the X and Z puzzles. You only get as many as the level needs.</div></li>
+        <li><span class="gate x">X</span><div data-i18n="lq.g.x"><b>X press</b> acts on the cell and its 4 neighbours. It swaps <code>|0⟩ ↔ |1⟩</code> and leaves <code>|+⟩</code> and <code>|−⟩</code> alone, since <code>X|±⟩ = ±|±⟩</code> is the same state up to a global phase.</div></li>
+        <li><span class="gate z">Z</span><div data-i18n="lq.g.z"><b>Z press</b> acts on the same cross. It swaps <code>|+⟩ ↔ |−⟩</code> and leaves <code>|0⟩</code> and <code>|1⟩</code> alone.</div></li>
+        <li><span class="gate h">H</span><div data-i18n="lq.g.h"><b>Hadamard</b> acts on a single cell. It swaps <code>|0⟩ ↔ |+⟩</code> and <code>|1⟩ ↔ |−⟩</code>, which moves the qubit between the X and Z puzzles. You only get as many as the level needs.</div></li>
       </ul>
 
-      <h2>Reading the dials</h2>
+      <h2 data-i18n="lq.h.dials">Reading the dials</h2>
       <ul class="legend dials">
-        <li><span class="dial d0"></span><div><code>|0⟩</code> points up. This is the goal.</div></li>
-        <li><span class="dial d1"></span><div><code>|1⟩</code> points down: the light is on.</div></li>
-        <li><span class="dial dp"></span><div><code>|+⟩</code> points right, on the equator.</div></li>
-        <li><span class="dial dm"></span><div><code>|−⟩</code> points left, on the equator.</div></li>
+        <li><span class="dial d0"></span><div data-i18n="lq.d.0"><code>|0⟩</code> points up. This is the goal.</div></li>
+        <li><span class="dial d1"></span><div data-i18n="lq.d.1"><code>|1⟩</code> points down: the light is on.</div></li>
+        <li><span class="dial dp"></span><div data-i18n="lq.d.p"><code>|+⟩</code> points right, on the equator.</div></li>
+        <li><span class="dial dm"></span><div data-i18n="lq.d.m"><code>|−⟩</code> points left, on the equator.</div></li>
       </ul>
-      <p class="note">Each dial is a Bloch sphere seen from the side. Gates rotate the arrow the same way the real gate rotates the qubit.</p>
+      <p class="note" data-i18n="lq.note">Each dial is a Bloch sphere seen from the side. Gates rotate the arrow the same way the real gate rotates the qubit.</p>
 
-      <h2>Hints</h2>
+      <h2 data-i18n="lq.h.hints">Hints</h2>
       <ul class="keys">
-        <li>X presses can't touch a <code>|±⟩</code> cell, and Z presses can't touch <code>|0⟩</code>/<code>|1⟩</code>. That gives you two separate puzzles.</li>
-        <li>Each <code>|±⟩</code> cell needs exactly one H to come home. Choose whether to fix its phase before the H or its bit after it.</li>
-        <li>🔒 locked cells can't be pressed, but presses on their neighbours still reach them.</li>
+        <li data-i18n="lq.hint.1">X presses can't touch a <code>|±⟩</code> cell, and Z presses can't touch <code>|0⟩</code>/<code>|1⟩</code>. That gives you two separate puzzles.</li>
+        <li data-i18n="lq.hint.2">Each <code>|±⟩</code> cell needs exactly one H to come home. Choose whether to fix its phase before the H or its bit after it.</li>
+        <li data-i18n="lq.hint.3">🔒 locked cells can't be pressed, but presses on their neighbours still reach them.</li>
       </ul>
 
-      <h2>Controls</h2>
+      <h2 data-i18n="lq.h.controls">Controls</h2>
       <ul class="keys">
-        <li><kbd>click</kbd> apply the selected gate · <kbd>X</kbd> <kbd>Z</kbd> <kbd>H</kbd> pick a gate</li>
-        <li><kbd>U</kbd> undo · <kbd>R</kbd> reset · <kbd>N</kbd>/<kbd>P</kbd> next/previous level · <kbd>M</kbd> mute</li>
+        <li data-i18n="lq.k.1"><kbd>click</kbd> apply the selected gate · <kbd>X</kbd> <kbd>Z</kbd> <kbd>H</kbd> pick a gate</li>
+        <li data-i18n="lq.k.2"><kbd>U</kbd> undo · <kbd>R</kbd> reset · <kbd>N</kbd>/<kbd>P</kbd> next/previous level · <kbd>M</kbd> mute</li>
       </ul>
     </aside>
   </main>
 
-  <footer>Static page: no build step and no tracking. Plain canvas and JavaScript.</footer>
+  <footer data-i18n="lq.footer">Static page: no build step and no tracking. Plain canvas and JavaScript.</footer>
+  <script src="i18n.cs.js"></script>
+  <script src="../i18n.js"></script>
   <script src="game.js"></script>
 </body>
 </html>

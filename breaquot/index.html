@@ -14,62 +14,64 @@
 </head>
 <body>
   <header class="top">
-    <a class="back" href="../">← quantum arcade</a>
+    <a class="back" href="../" data-i18n="bq.back">← quantum arcade</a>
     <h1 class="logo"><span class="bra">|</span>BREAQUOT<span class="ket">⟩</span></h1>
-    <p class="sub">breakout, where the ball is a wave packet</p>
+    <p class="sub" data-i18n="bq.sub">breakout, where the ball is a wave packet</p>
   </header>
 
   <main class="app">
     <section class="stage-col">
       <div class="hud">
-        <div><span class="lbl">SCORE</span><span id="score" class="val">0</span></div>
-        <div><span class="lbl">LEVEL</span><span id="level" class="val">1</span></div>
-        <div><span class="lbl">LIVES</span><span id="lives" class="val icons"></span></div>
-        <div><span class="lbl">HIGH</span><span id="high" class="val">0</span></div>
+        <div><span class="lbl" data-i18n="bq.lbl.score">SCORE</span><span id="score" class="val">0</span></div>
+        <div><span class="lbl" data-i18n="bq.lbl.level">LEVEL</span><span id="level" class="val">1</span></div>
+        <div><span class="lbl" data-i18n="bq.lbl.lives">LIVES</span><span id="lives" class="val icons"></span></div>
+        <div><span class="lbl" data-i18n="bq.lbl.high">HIGH</span><span id="high" class="val">0</span></div>
       </div>
       <div class="stage" id="stage">
-        <canvas id="game" aria-label="Breaquot game board"></canvas>
+        <canvas id="game" aria-label="Breaquot game board" data-i18n-aria="bq.aria"></canvas>
         <div id="overlay" class="overlay"></div>
       </div>
       <div class="touch" id="touch">
-        <button type="button" data-act="action">LAUNCH / MEASURE</button>
+        <button type="button" data-act="action" data-i18n="bq.touch.action">LAUNCH / MEASURE</button>
         <button type="button" data-act="pause">II</button>
       </div>
       <div class="hud hud-bottom">
-        <div><span class="lbl">COHERENCE</span><span class="coh-wrap"><span id="coh"></span></span></div>
+        <div><span class="lbl" data-i18n="bq.lbl.coh">COHERENCE</span><span class="coh-wrap"><span id="coh"></span></span></div>
         <button id="muteBtn" class="chip" type="button">♪ ON</button>
       </div>
     </section>
 
     <aside class="panel">
-      <h2>State register</h2>
+      <h2 data-i18n="bq.h.state">State register</h2>
       <div class="ket-box">
         <div id="ket" class="ket-text">|ψ⟩ = |ball⟩</div>
         <div id="probs" class="probs">a definite classical ball</div>
       </div>
 
-      <h2>Optics on the board</h2>
+      <h2 data-i18n="bq.h.optics">Optics on the board</h2>
       <ul class="legend">
-        <li><span class="gate h">H</span><div><b>Beam splitter</b>: a branch that hits it splits in two. Half the probability bounces back, with its phase flipped (<code>+ → −</code>), and half passes through.</div></li>
-        <li><span class="sym steel">▒</span><div><b>Barrier</b>: steel bounces the ball, but 15% of each branch <b>tunnels</b> through.</div></li>
-        <li><span class="gate z">Z</span><div><b>Phase plate</b>: anything passing through gets its phase flipped. Cyan branches are <code>|+⟩</code> and magenta ones are <code>|−⟩</code>.</div></li>
-        <li><span class="sym">✕</span><div><b>Interference</b>: when two branches meet, they recombine. With the <b>same phase</b>, the merged ball keeps going their way. With <b>opposite phases</b>, it comes out the other way.</div></li>
-        <li><span class="sym num">p</span><div><b>Expected damage</b>: a branch with probability p deals p damage, so splitting covers more bricks with weaker hits.</div></li>
-        <li><span class="sym wave">〰</span><div><b>Entangled bricks</b> come in pairs. Break one and its partner shatters too.</div></li>
-        <li><span class="sym">👁</span><div><b>The paddle is a detector.</b> A branch reaching the bottom is measured: with probability p, it's the real ball. Real and caught: it bounces. Real and missed: you lose a life. Not real: it vanishes, and its probability moves to the other branches.</div></li>
-        <li><span class="sym">⌛</span><div><b>Decoherence</b>: a superposition lasts 12 s, then it collapses on its own. <kbd>Space</kbd> collapses it right away.</div></li>
+        <li><span class="gate h">H</span><div data-i18n="bq.rule.split"><b>Beam splitter</b>: a branch that hits it splits in two. Half the probability bounces back, with its phase flipped (<code>+ → −</code>), and half passes through.</div></li>
+        <li><span class="sym steel">▒</span><div data-i18n="bq.rule.barrier"><b>Barrier</b>: steel bounces the ball, but 15% of each branch <b>tunnels</b> through.</div></li>
+        <li><span class="gate z">Z</span><div data-i18n="bq.rule.plate"><b>Phase plate</b>: anything passing through gets its phase flipped. Cyan branches are <code>|+⟩</code> and magenta ones are <code>|−⟩</code>.</div></li>
+        <li><span class="sym">✕</span><div data-i18n="bq.rule.interf"><b>Interference</b>: when two branches meet, they recombine. With the <b>same phase</b>, the merged ball keeps going their way. With <b>opposite phases</b>, it comes out the other way.</div></li>
+        <li><span class="sym num">p</span><div data-i18n="bq.rule.damage"><b>Expected damage</b>: a branch with probability p deals p damage, so splitting covers more bricks with weaker hits.</div></li>
+        <li><span class="sym wave">〰</span><div data-i18n="bq.rule.ent"><b>Entangled bricks</b> come in pairs. Break one and its partner shatters too.</div></li>
+        <li><span class="sym">👁</span><div data-i18n="bq.rule.paddle"><b>The paddle is a detector.</b> A branch reaching the bottom is measured: with probability p, it's the real ball. Real and caught: it bounces. Real and missed: you lose a life. Not real: it vanishes, and its probability moves to the other branches.</div></li>
+        <li><span class="sym">⌛</span><div data-i18n="bq.rule.decoh"><b>Decoherence</b>: a superposition lasts 12 s, then it collapses on its own. <kbd>Space</kbd> collapses it right away.</div></li>
       </ul>
 
-      <h2>Controls</h2>
+      <h2 data-i18n="bq.h.controls">Controls</h2>
       <ul class="keys">
-        <li>mouse/touch or <kbd>←</kbd><kbd>→</kbd>/<kbd>A</kbd><kbd>D</kbd> move the paddle</li>
-        <li><kbd>Space</kbd>/click launch · <kbd>Space</kbd> measure</li>
-        <li><kbd>P</kbd> pause · <kbd>M</kbd> mute</li>
+        <li data-i18n="bq.key.move">mouse/touch or <kbd>←</kbd><kbd>→</kbd>/<kbd>A</kbd><kbd>D</kbd> move the paddle</li>
+        <li data-i18n="bq.key.launch"><kbd>Space</kbd>/click launch · <kbd>Space</kbd> measure</li>
+        <li data-i18n="bq.key.pause"><kbd>P</kbd> pause · <kbd>M</kbd> mute</li>
       </ul>
     </aside>
   </main>
 
-  <footer>Static page: no build step and no tracking. Plain canvas and JavaScript.</footer>
+  <footer data-i18n="bq.footer">Static page: no build step and no tracking. Plain canvas and JavaScript.</footer>
+  <script src="i18n.cs.js"></script>
+  <script src="../i18n.js"></script>
   <script src="game.js"></script>
 </body>
 </html>

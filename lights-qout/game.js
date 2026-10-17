@@ -8,6 +8,8 @@
  * a seeded RNG, so each one is solvable within its par.
  */
 (() => {
+  const t = (s, v) => (window.QA ? QA.t(s, v) : String(s).replace(/\{(\w+)\}/g, (m, k) => (v && k in v ? v[k] : m)));
+
   const GATES = {
     X: [1, 0, 2, 3], // |0⟩↔|1⟩, |±⟩ unchanged (up to global phase)
     Z: [0, 1, 3, 2], // |+⟩↔|−⟩, |0⟩/|1⟩ unchanged
@@ -215,7 +217,7 @@
     if (tool === 'H') hLeft--;
     sfx[tool]();
     const changed = cells.filter(j => before[j] !== state[j]).length;
-    if (!changed) setStatus(`${tool} did nothing here: those qubits are its eigenstates.`);
+    if (!changed) setStatus('{gate} did nothing here: those qubits are its eigenstates.', '', { gate: tool });
     else setStatus(' ');
     if (solved(puzzle.board, state)) win();
   }
@@ -238,7 +240,7 @@
       saveProgress();
     }
     sfx.win();
-    setStatus(moves < par ? `Under par, nice! ${moves} moves (par ${par}).` : `Solved in ${moves} moves (par ${par}).`, 'win');
+    setStatus(moves < par ? 'Under par, nice! {moves} moves (par {par}).' : 'Solved in {moves} moves (par {par}).', 'win', { moves, par });
     setTimeout(() => { if (won) showOverlay('win', { stars, moves, par }); }, 700);
   }
 
@@ -346,8 +348,11 @@
   // --------------------------------------------------------------- HUD --
   const $ = id => document.getElementById(id);
   const statusEl = $('status');
-  function setStatus(text, cls = '') {
-    statusEl.textContent = text;
+  // The status is kept as key + values so a language switch can redraw it.
+  let lastStatus = { key: '', cls: '', vars: null };
+  function setStatus(key, cls = '', vars = null) {
+    lastStatus = { key, cls, vars };
+    statusEl.textContent = t(key, vars);
     statusEl.className = 'status' + (cls ? ' ' + cls : '');
   }
   const set = (node, v) => { v = String(v); if (node._v !== v) { node._v = v; node.textContent = v; } };
@@ -366,7 +371,9 @@
 
   // ----------------------------------------------------------- overlay --
   const overlay = $('overlay');
+  let overlayState = null;
   function showOverlay(kind, info) {
+    overlayState = kind ? { kind, info } : null;
     if (!kind) { overlay.classList.remove('show'); overlay.innerHTML = ''; return; }
     let html = '';
     if (kind === 'win') {
@@ -374,13 +381,13 @@
       html = `<div class="card">
         <div class="big">|ψ⟩ = |00…0⟩</div>
         <div class="bigstars">${stars}</div>
-        <p>${info.moves} moves · par ${info.par}${info.stars < 3 ? `. Three stars needs ${info.par} moves or fewer.` : '.'}</p>
+        <p>${t(info.stars < 3 ? '{moves} moves · par {par}. Three stars needs {par} moves or fewer.' : '{moves} moves · par {par}.', { moves: info.moves, par: info.par })}</p>
         <div class="row">
-          <button class="go" type="button" data-act="next">${levelIdx >= RANDOM - 1 ? 'RANDOM PUZZLE' : 'NEXT LEVEL'}</button>
+          <button class="go" type="button" data-act="next">${t(levelIdx >= RANDOM - 1 ? 'RANDOM PUZZLE' : 'NEXT LEVEL')}</button>
         </div>
         <div class="row">
-          <button class="ghostbtn" type="button" data-act="retry">RETRY</button>
-          <button class="ghostbtn" type="button" data-act="levels">LEVELS</button>
+          <button class="ghostbtn" type="button" data-act="retry">${t('RETRY')}</button>
+          <button class="ghostbtn" type="button" data-act="levels">${t('LEVELS')}</button>
         </div>
       </div>`;
     } else if (kind === 'levels') {
@@ -391,12 +398,12 @@
       }).join('');
       const total = Object.values(progress).reduce((s, p) => s + p.stars, 0);
       html = `<div class="card">
-        <div class="big">LEVELS</div>
-        <p>${total} / ${LEVELS.length * 3} stars</p>
+        <div class="big">${t('LEVELS')}</div>
+        <p>${t('{total} / {max} stars', { total, max: LEVELS.length * 3 })}</p>
         <div class="levels">${btns}</div>
         <div class="row">
-          <button class="go" type="button" data-level="${RANDOM}">∞ RANDOM</button>
-          <button class="ghostbtn" type="button" data-act="close">CLOSE</button>
+          <button class="go" type="button" data-level="${RANDOM}">${t('∞ RANDOM')}</button>
+          <button class="ghostbtn" type="button" data-act="close">${t('CLOSE')}</button>
         </div>
       </div>`;
     }
@@ -438,9 +445,10 @@
   const muteBtn = $('muteBtn');
   function toggleMute() {
     muted = !muted;
-    muteBtn.textContent = muted ? '♪ OFF' : '♪ ON';
+    muteBtn.textContent = t(muted ? '♪ OFF' : '♪ ON');
     try { localStorage.setItem('lightsqout-muted', muted ? '1' : '0'); } catch (e) { /* ignore */ }
   }
+  muteBtn.textContent = t('♪ ON');
   try { if (localStorage.getItem('lightsqout-muted') === '1') toggleMute(); } catch (e) { /* ignore */ }
   muteBtn.addEventListener('click', () => { toggleMute(); muteBtn.blur(); });
 
@@ -462,6 +470,14 @@
       case 'KeyM': toggleMute(); break;
     }
   });
+
+  if (window.QA) {
+    QA.onChange(() => {
+      setStatus(lastStatus.key, lastStatus.cls, lastStatus.vars);
+      if (overlayState) showOverlay(overlayState.kind, overlayState.info);
+      muteBtn.textContent = t(muted ? '♪ OFF' : '♪ ON');
+    });
+  }
 
   // -------------------------------------------------------------- loop --
   loadLevel(levelIdx);

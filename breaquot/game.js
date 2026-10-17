@@ -7,6 +7,7 @@
  * interfere, and the paddle measures any branch that reaches the bottom.
  */
 (() => {
+  const t = (s, v) => (window.QA ? QA.t(s, v) : String(s).replace(/\{(\w+)\}/g, (m, k) => (v && k in v ? v[k] : m)));
   const W = 520, H = 640, COLS = 13, BW = 40, BH = 20, TOP = 64;
   const PY = 596, PH = 10, PW = 86, R = 6;
   const MAX_BRANCHES = 8, COHERENCE = 12;
@@ -189,8 +190,8 @@
   }
 
   function renormalize() {
-    const t = psi.reduce((s, b) => s + b.p, 0);
-    if (t > 0) for (const b of psi) b.p /= t;
+    const total = psi.reduce((s, b) => s + b.p, 0);
+    if (total > 0) for (const b of psi) b.p /= total;
   }
 
   function collapseTo(b, msg) {
@@ -198,7 +199,7 @@
     psi = [b];
     b.p = 1; b.ph = 1; b.name = 'a';
     coherT = 0;
-    if (msg) popup(b.x, b.y - 16, msg, '#7ff9ff');
+    if (msg) popup(b.x, b.y - 16, t(msg.key, msg.vars), '#7ff9ff');
     sfx.measure();
   }
 
@@ -243,7 +244,7 @@
     burst(k.x + k.w / 2, k.y + k.h / 2, color, 14, 150);
     addScore(50 * k.max + (spooky ? 100 : 0));
     sfx.breakB();
-    if (spooky) popup(k.x + k.w / 2, k.y, 'SPOOKY +150', ENT_COLOR, 1.3);
+    if (spooky) popup(k.x + k.w / 2, k.y, t('SPOOKY +150'), ENT_COLOR, 1.3);
     if (k.pair && k.pair.alive) {
       sfx.spooky();
       breakBrick(k.pair, true);
@@ -255,18 +256,18 @@
     if (k.type === 'H' || k.type === 'S') {
       const T = k.type === 'H' ? 0.5 : 0.15;
       if (psi.length < MAX_BRANCHES && b.p * T > 0.004) {
-        const t = { ...b, p: b.p * T, through: k, age: 0, zIn: new Set(b.zIn), trail: [], passed: false, name: freeLetter() };
+        const tb = { ...b, p: b.p * T, through: k, age: 0, zIn: new Set(b.zIn), trail: [], passed: false, name: freeLetter() };
         b.p *= 1 - T;
         b.ph = -b.ph;
         b.age = 0;
         reflectOff(b, k);
         if (psi.length === 1) coherT = COHERENCE;
-        psi.push(t);
-        popup(k.x + k.w / 2, k.y - 6, k.type === 'H' ? 'SPLIT 50/50' : `TUNNEL ${pct(t.p)}`, k.type === 'H' ? '#7ff9ff' : '#c9cde0', 0.9);
+        psi.push(tb);
+        popup(k.x + k.w / 2, k.y - 6, k.type === 'H' ? t('SPLIT 50/50') : t('TUNNEL {p}', { p: pct(tb.p) }), k.type === 'H' ? '#7ff9ff' : '#c9cde0', 0.9);
         sfx.split();
       } else if (Math.random() < T) {
         b.through = k;
-        popup(k.x + k.w / 2, k.y - 6, 'TRANSMITTED', '#c9cde0', 0.8);
+        popup(k.x + k.w / 2, k.y - 6, t('TRANSMITTED'), '#c9cde0', 0.8);
       } else {
         b.ph = -b.ph;
         reflectOff(b, k);
@@ -286,14 +287,14 @@
       const real = Math.random() < b.p;
       if (!real) {
         burst(b.x, b.y, PHASE_COLOR[b.ph], 10, 100);
-        popup(b.x, PY - 20, `NOT HERE (${pct(b.p)})`, '#9690c6');
+        popup(b.x, PY - 20, t('NOT HERE ({p})', { p: pct(b.p) }), '#9690c6');
         psi.splice(psi.indexOf(b), 1);
         renormalize();
         if (psi.length === 1) { psi[0].ph = 1; coherT = 0; }
         sfx.vanish();
         return;
       }
-      collapseTo(b, `HERE! (${pct(b.p)})`);
+      collapseTo(b, { key: 'HERE! ({p})', vars: { p: pct(b.p) } });
     }
     const half = paddle.w / 2 + R;
     if (b.x >= paddle.x - half && b.x <= paddle.x + half) {
@@ -320,7 +321,7 @@
         fixAngle(a);
         psi.splice(j, 1);
         burst(a.x, a.y, same ? '#7ff9ff' : '#ff4fd8', 16, 140);
-        popup(a.x, a.y - 16, same ? 'CONSTRUCTIVE' : 'DESTRUCTIVE: OTHER PORT', same ? '#7ff9ff' : '#ff4fd8', 1.2);
+        popup(a.x, a.y - 16, same ? t('CONSTRUCTIVE') : t('DESTRUCTIVE: OTHER PORT'), same ? '#7ff9ff' : '#ff4fd8', 1.2);
         addScore(50);
         if (psi.length === 1) { a.ph = 1; coherT = 0; }
         sfx.merge(same);
@@ -338,7 +339,7 @@
       try { localStorage.setItem('breaquot-high', String(high)); } catch (e) { /* storage unavailable */ }
       showOverlay('gameover');
     } else {
-      popup(paddle.x, PY - 30, 'COLLAPSED INTO THE VOID', '#ff6b8b', 1.4);
+      popup(paddle.x, PY - 30, t('COLLAPSED INTO THE VOID'), '#ff6b8b', 1.4);
     }
   }
 
@@ -381,7 +382,7 @@
 
     if (psi.length > 1) {
       coherT -= h;
-      if (coherT <= 0) measureAll('DECOHERED');
+      if (coherT <= 0) measureAll({ key: 'DECOHERED' });
     }
 
     if (!bricks.some(k => k.alive && (k.type === 'n' || k.type === 'E'))) {
@@ -521,7 +522,7 @@
           ctx.fillStyle = '#9690c6';
           ctx.font = '8px "Press Start 2P", monospace';
           ctx.textAlign = 'center';
-          ctx.fillText(touchy ? 'TAP TO LAUNCH' : 'SPACE / CLICK TO LAUNCH', W / 2, PY - 40);
+          ctx.fillText(touchy ? t('TAP TO LAUNCH') : t('SPACE / CLICK TO LAUNCH'), W / 2, PY - 40);
         }
       }
       return;
@@ -604,11 +605,11 @@
       ctx.font = '12px "Press Start 2P", monospace';
       ctx.fillStyle = '#ffe14d'; ctx.shadowColor = '#ffe14d'; ctx.shadowBlur = 12;
       const L = LEVELS[levelIdx % LEVELS.length];
-      ctx.fillText(scene === 'clear' ? 'LEVEL CLEARED' : `LEVEL ${levelIdx + 1}`, W / 2, 400);
+      ctx.fillText(scene === 'clear' ? t('LEVEL CLEARED') : t('LEVEL {n}', { n: levelIdx + 1 }), W / 2, 400);
       if (scene === 'ready') {
         ctx.font = '9px "Press Start 2P", monospace';
         ctx.fillStyle = '#7ff9ff'; ctx.shadowColor = '#7ff9ff';
-        ctx.fillText(L.name, W / 2, 424);
+        ctx.fillText(t(L.name), W / 2, 424);
       }
       ctx.restore();
     }
@@ -636,41 +637,43 @@
       set(el.probs, sorted.map(b => `P(${b.name}) = ${pct(b.p)}`).join(' · '));
       el.coh.style.width = (coherT / COHERENCE * 100).toFixed(1) + '%';
     } else {
-      set(el.ket, '|ψ⟩ = |ball⟩');
-      set(el.probs, stuck ? 'resting on the detector' : 'a definite classical ball · hit an H to split it');
+      set(el.ket, t('|ψ⟩ = |ball⟩'));
+      set(el.probs, stuck ? t('resting on the detector') : t('a definite classical ball · hit an H to split it'));
       el.coh.style.width = '0%';
     }
   }
 
   // ----------------------------------------------------------- overlay --
   const touchy = window.matchMedia && matchMedia('(pointer: coarse)').matches;
+  let overlayKind = null;
   function showOverlay(kind) {
     const o = el.overlay;
+    overlayKind = kind;
     if (!kind) { o.classList.remove('show'); o.innerHTML = ''; return; }
     let html = '';
     if (kind === 'title') {
       html = `<div class="card">
         <div class="card-logo"><b>|</b>BREAQUOT<b>⟩</b></div>
-        <p>The ball is a wave packet. Split it, steer its phase, make it interfere, and catch the branch that turns out to be real.</p>
+        <p>${t('The ball is a wave packet. Split it, steer its phase, make it interfere, and catch the branch that turns out to be real.')}</p>
         <ul class="mini">
-          <li><span class="gate h">H</span>Beam splitters divide the ball 50/50</li>
-          <li><span class="gate z">Z</span>Phase plates flip the phase of a branch</li>
-          <li><span class="sym">✕</span>Meeting branches interfere</li>
-          <li><span class="sym">👁</span>The paddle measures each branch that reaches it</li>
+          <li><span class="gate h">H</span>${t('Beam splitters divide the ball 50/50')}</li>
+          <li><span class="gate z">Z</span>${t('Phase plates flip the phase of a branch')}</li>
+          <li><span class="sym">✕</span>${t('Meeting branches interfere')}</li>
+          <li><span class="sym">👁</span>${t('The paddle measures each branch that reaches it')}</li>
         </ul>
-        <button class="go" type="button" data-act="start">${touchy ? 'TAP TO START' : 'PRESS ENTER'}</button>
-        <p class="hint">${touchy ? 'drag to move · tap to launch' : 'mouse or ←→ · space/click launch · space measure · P pause'}</p>
+        <button class="go" type="button" data-act="start">${touchy ? t('TAP TO START') : t('PRESS ENTER')}</button>
+        <p class="hint">${touchy ? t('drag to move · tap to launch') : t('mouse or ←→ · space/click launch · space measure · P pause')}</p>
       </div>`;
     } else if (kind === 'paused') {
-      html = `<div class="card"><div class="big">PAUSED</div>
-        <p>The wavefunction is holding its breath.</p>
-        <button class="go" type="button" data-act="resume">${touchy ? 'TAP TO RESUME' : 'P TO RESUME'}</button></div>`;
+      html = `<div class="card"><div class="big">${t('PAUSED')}</div>
+        <p>${t('The wavefunction is holding its breath.')}</p>
+        <button class="go" type="button" data-act="resume">${touchy ? t('TAP TO RESUME') : t('P TO RESUME')}</button></div>`;
     } else if (kind === 'gameover') {
-      html = `<div class="card"><div class="big" style="color:#ff3b5c">GAME OVER</div>
-        <p>Every branch eventually found the floor.</p>
+      html = `<div class="card"><div class="big" style="color:#ff3b5c">${t('GAME OVER')}</div>
+        <p>${t('Every branch eventually found the floor.')}</p>
         <p class="big">${score}</p>
-        <p>level ${levelIdx + 1} · ${score >= high && score > 0 ? 'new high score!' : 'high score ' + high}</p>
-        <button class="go" type="button" data-act="start">${touchy ? 'TAP TO RETRY' : 'ENTER TO RETRY'}</button></div>`;
+        <p>${t('level {n}', { n: levelIdx + 1 })} · ${score >= high && score > 0 ? t('new high score!') : t('high score {high}', { high })}</p>
+        <button class="go" type="button" data-act="start">${touchy ? t('TAP TO RETRY') : t('ENTER TO RETRY')}</button></div>`;
     }
     o.innerHTML = html;
     o.classList.add('show');
@@ -689,7 +692,7 @@
   function action() {
     if (scene === 'title' || scene === 'gameover') { startGame(); return; }
     if (scene !== 'play') return;
-    if (stuck) launch(); else measureAll('MEASURED');
+    if (stuck) launch(); else measureAll({ key: 'MEASURED' });
   }
 
   el.overlay.addEventListener('click', e => {
@@ -708,11 +711,18 @@
 
   function toggleMute() {
     muted = !muted;
-    el.mute.textContent = muted ? '♪ OFF' : '♪ ON';
+    el.mute.textContent = muted ? t('♪ OFF') : t('♪ ON');
     try { localStorage.setItem('breaquot-muted', muted ? '1' : '0'); } catch (e) { /* ignore */ }
   }
   try { if (localStorage.getItem('breaquot-muted') === '1') toggleMute(); } catch (e) { /* ignore */ }
   el.mute.addEventListener('click', () => { toggleMute(); el.mute.blur(); });
+  el.mute.textContent = muted ? t('♪ OFF') : t('♪ ON');
+  if (window.QA) QA.onChange(() => {
+    if (overlayKind) showOverlay(overlayKind);
+    el.mute.textContent = muted ? t('♪ OFF') : t('♪ ON');
+    el.ket._v = el.probs._v = undefined;
+    updateHUD();
+  });
 
   // ------------------------------------------------------------- input --
   const stage = $('stage');

@@ -15,6 +15,8 @@ Classic computer games rebuilt around quantum mechanics: superposition, phase fl
 
 Each game's page lists its full rules and controls in a side panel.
 
+Every page is available in **English and Czech**. Use the CS/EN switch in the top-right corner, or add `?lang=cs` / `?lang=en` to a link.
+
 ## Run locally
 
 ```sh
@@ -25,7 +27,11 @@ python3 -m http.server 8000   # then open http://localhost:8000
 
 - `index.html` is the arcade landing page.
 - Each game lives in its own folder (`index.html`, `style.css`, `game.js`, `favicon.svg`) and links back to the arcade.
-- To add a game, create a new folder and add a card for it to `index.html`.
+- `i18n.js` is the shared language switch. Each page loads its own Czech dictionary from `i18n.cs.js` first:
+  - Static text is marked with `data-i18n="key"`.
+  - Script text goes through `QA.t('English text', {vars})`.
+  - `QA.onChange(fn)` lets a page redraw text it generated itself.
+- To add a game, create a new folder, add a card for it to `index.html`, and include its `i18n.cs.js` together with `../i18n.js`.
 
 ## Deploying
 

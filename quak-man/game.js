@@ -6,6 +6,8 @@
  * integer x/y. Grid movers travel from centre to centre towards (tx, ty).
  */
 (() => {
+  const t = (s, v) => (window.QA ? QA.t(s, v) : String(s).replace(/\{(\w+)\}/g, (m, k) => (v && k in v ? v[k] : m)));
+
   // ---------------------------------------------------------------- maze --
   const T = 20, COLS = 28, ROWS = 31, TUNNEL_ROW = 14;
   const W = COLS * T, H = ROWS * T;
@@ -267,7 +269,7 @@
     score += n;
     if (score >= nextLifeAt) {
       nextLifeAt += 10000; lives++;
-      popup(psi[0].x, psi[0].y - 1.5, '1UP', '#ffe14d', 1.5);
+      popup(psi[0].x, psi[0].y - 1.5, t('1UP'), '#ffe14d', 1.5);
       sfx.life();
     }
     if (score > high) high = score;
@@ -451,7 +453,7 @@
       else { g.phase = 1; g.fright = 0; toPlus++; }
       reverseGhost(g);
     }
-    popup(b.x, b.y - 1, toPlus && !toMinus ? 'Z|−⟩ = |+⟩ !' : 'Z: PHASE FLIP', '#ff4fd8');
+    popup(b.x, b.y - 1, toPlus && !toMinus ? 'Z|−⟩ = |+⟩ !' : t('Z: PHASE FLIP'), '#ff4fd8');
     sfx.zgate();
   }
 
@@ -464,7 +466,7 @@
       // The gate acts on both branches: the mirror tile's pickup is consumed too.
       if (m.x >= 0 && m.x < COLS && dots[m.y][m.x]) { dots[m.y][m.x] = ''; dotsLeft--; addScore(50); }
       trail(b.x, b.y, m.x, m.y, '#3ff4ff');
-      popup(13.5, b.y - 1, 'H: SUPERPOSITION', '#3ff4ff');
+      popup(13.5, b.y - 1, t('H: SUPERPOSITION'), '#3ff4ff');
       sfx.hgate();
     } else {
       collapseTo(psi.find(x => !x.mirror) || psi[0], 'H·H = I');
@@ -478,7 +480,7 @@
     psi = [keep];
     keep.mirror = false;
     superT = 0;
-    if (msg) popup(keep.x, keep.y - 1, msg, '#7ff9ff');
+    if (msg) popup(keep.x, keep.y - 1, t(msg), '#7ff9ff');
     sfx.measure();
   }
 
@@ -539,7 +541,7 @@
     for (const g of [c, c.twin]) {
       if (psi.some(b => sees(b, g))) {
         collapseClyde(Math.random() < 0.5 ? c : c.twin);
-        popup(c.x, c.y - 1, 'OBSERVED', '#ffb347');
+        popup(c.x, c.y - 1, t('OBSERVED'), '#ffb347');
         sfx.observe();
         return;
       }
@@ -553,7 +555,7 @@
     eatChain = Math.min(eatChain + 1, 4);
     const pts = 100 * 2 ** eatChain;
     addScore(pts);
-    popup(g.x, g.y, spooky ? 'SPOOKY ' + pts : pts, spooky ? '#ffb0d8' : '#7ff9ff', 1.3);
+    popup(g.x, g.y, spooky ? t('SPOOKY {pts}', { pts }) : pts, spooky ? '#ffb0d8' : '#7ff9ff', 1.3);
     burst(g.x, g.y, g.color, 14);
     freezeT = 0.35;
     if (spooky) sfx.spooky(); else sfx.eat();
@@ -595,7 +597,7 @@
         if (g.twin || g.isTwin) {
           if (Math.random() < 0.5) {
             collapseClyde(g.twin || g.origin);
-            popup(b.x, b.y - 1, 'NOBODY HOME', '#ffb347');
+            popup(b.x, b.y - 1, t('NOBODY HOME'), '#ffb347');
             sfx.observe();
             return;
           }
@@ -621,7 +623,7 @@
 
   function tryTunnel() {
     if (scene !== 'play' || freezeT > 0) return;
-    if (tunnels <= 0) { popup(psi[0].x, psi[0].y - 1, 'NO TUNNELS', '#ff6b8b'); return; }
+    if (tunnels <= 0) { popup(psi[0].x, psi[0].y - 1, t('NO TUNNELS'), '#ff6b8b'); return; }
     let attempted = false;
     for (const b of [...psi]) {
       if (!psi.includes(b)) continue;
@@ -638,17 +640,17 @@
       if (Math.random() < p) {
         trail(b.x, b.y, nx, ny, '#ffe14d');
         b.x = nx; b.y = ny; b.tx = b.ty = null; b.dir = d;
-        popup(nx, ny - 1, `TUNNELED (${Math.round(p * 100)}%)`, '#ffe14d');
+        popup(nx, ny - 1, t('TUNNELED ({p}%)', { p: Math.round(p * 100) }), '#ffe14d');
         sfx.tunnel();
         arrivePlayer(b);
       } else {
         burst(ox + d.x * 0.6, oy + d.y * 0.6, '#ff6b8b', 10, 4);
-        popup(ox, oy - 1, `REFLECTED (${Math.round(p * 100)}%)`, '#ff6b8b');
+        popup(ox, oy - 1, t('REFLECTED ({p}%)', { p: Math.round(p * 100) }), '#ff6b8b');
         sfx.reflect();
       }
     }
     if (attempted) tunnels--;
-    else popup(psi[0].x, psi[0].y - 1, 'NO BARRIER', '#9690c6', 0.8);
+    else popup(psi[0].x, psi[0].y - 1, t('NO BARRIER'), '#9690c6', 0.8);
   }
 
   // -------------------------------------------------------------- scenes --
@@ -966,9 +968,9 @@
 
   function drawBanner() {
     let text = null, color = '#ffe14d';
-    if (scene === 'ready') text = 'READY!';
-    else if (scene === 'clear') { text = 'MAZE CLEARED'; color = '#3ff4ff'; }
-    else if (scene === 'gameover') { text = 'GAME  OVER'; color = '#ff3b5c'; }
+    if (scene === 'ready') text = t('READY!');
+    else if (scene === 'clear') { text = t('MAZE CLEARED'); color = '#3ff4ff'; }
+    else if (scene === 'gameover') { text = t('GAME  OVER'); color = '#ff3b5c'; }
     if (!text) return;
     ctx.save();
     ctx.font = '12px "Press Start 2P", monospace';
@@ -978,7 +980,7 @@
     if (scene === 'ready') {
       ctx.font = '8px "Press Start 2P", monospace';
       ctx.fillStyle = '#3ff4ff'; ctx.shadowColor = '#3ff4ff';
-      ctx.fillText('LEVEL ' + level, W / 2, cx(11) - 2);
+      ctx.fillText(t('LEVEL {n}', { n: level }), W / 2, cx(11) - 2);
     }
     ctx.restore();
   }
@@ -1023,12 +1025,12 @@
   function ghostStatus(g) {
     const partner = PAIRS.flat()[PAIRS.flat().indexOf(g.name) ^ 1];
     let s;
-    if (g.state === 'house') s = 'boxed';
-    else if (g.state === 'leaving') s = 'emerging';
-    else if (g.state === 'eyes' || g.state === 'entering') s = 'collapsed, returning';
-    else if (g.twin) s = '<b>(|a⟩+|b⟩)/√2</b> unobserved';
-    else if (g.phase > 0) s = `<b>|+⟩</b> ${chaseMode === 'chase' ? 'hunting' : 'scattering'}`;
-    else s = `<b>|−⟩</b> edible${g.fright < 2 ? ', decohering' : ''}`;
+    if (g.state === 'house') s = t('boxed');
+    else if (g.state === 'leaving') s = t('emerging');
+    else if (g.state === 'eyes' || g.state === 'entering') s = t('collapsed, returning');
+    else if (g.twin) s = '<b>(|a⟩+|b⟩)/√2</b> ' + t('unobserved');
+    else if (g.phase > 0) s = '<b>|+⟩</b> ' + t(chaseMode === 'chase' ? 'hunting' : 'scattering');
+    else s = '<b>|−⟩</b> ' + t(g.fright < 2 ? 'edible, decohering' : 'edible');
     return `${s} · ⇄ ${partner}`;
   }
 
@@ -1040,12 +1042,12 @@
     set(el.tunnels, '◆'.repeat(tunnels) + '◇'.repeat(Math.max(0, TUNNELS_PER_LEVEL - tunnels)));
     if (psi.length > 1) {
       set(el.ket, '|ψ⟩ = (|L⟩ + |R⟩)/√2');
-      set(el.probs, `P(L) = 50% · P(R) = 50% · coherent ${superT.toFixed(1)}s`);
+      set(el.probs, t('P(L) = 50% · P(R) = 50% · coherent {s}s', { s: superT.toFixed(1) }));
       el.coh.style.width = (superT / SUPER_TIME * 100).toFixed(1) + '%';
     } else {
       const b = psi[0];
       set(el.ket, '|ψ⟩ = |x⟩');
-      set(el.probs, `definite at (${Math.round(b.x)}, ${Math.round(b.y)}) · eat H to superpose`);
+      set(el.probs, t('definite at ({x}, {y}) · eat H to superpose', { x: Math.round(b.x), y: Math.round(b.y) }));
       el.coh.style.width = '0%';
     }
     GHOST_DEFS.forEach((d, i) => {
@@ -1056,35 +1058,37 @@
 
   // ------------------------------------------------------------- overlay --
   const touchy = window.matchMedia && matchMedia('(pointer: coarse)').matches;
+  let overlayKind = null;
   function showOverlay(kind) {
     const o = el.overlay;
+    overlayKind = kind;
     if (!kind) { o.classList.remove('show'); o.innerHTML = ''; return; }
-    const go = touchy ? 'TAP TO START' : 'PRESS ENTER';
+    const go = t(touchy ? 'TAP TO START' : 'PRESS ENTER');
     let html = '';
     if (kind === 'title') {
       html = `<div class="card">
         <div class="card-logo"><b>|</b>QUAK-MAN<b>⟩</b></div>
-        <p>You're a quantum particle loose in a maze. Eat every dot without being measured by a ghost.</p>
+        <p>${t("You're a quantum particle loose in a maze. Eat every dot without being measured by a ghost.")}</p>
         <ul class="mini">
-          <li><span class="gate h">H</span>Split into two mirrored copies</li>
-          <li><span class="gate z">Z</span>Flip ghosts |+⟩ → |−⟩ (edible), and back</li>
-          <li><span class="sym wave">〰</span>Entangled ghosts: eat one, catch both</li>
-          <li><span class="sym">?</span>Schrödinger's Clyde: two places until seen</li>
-          <li><span class="sym ring">◎</span>EPR portals · <kbd>T</kbd> to tunnel through walls</li>
+          <li><span class="gate h">H</span>${t('Split into two mirrored copies')}</li>
+          <li><span class="gate z">Z</span>${t('Flip ghosts |+⟩ → |−⟩ (edible), and back')}</li>
+          <li><span class="sym wave">〰</span>${t('Entangled ghosts: eat one, catch both')}</li>
+          <li><span class="sym">?</span>${t("Schrödinger's Clyde: two places until seen")}</li>
+          <li><span class="sym ring">◎</span>${t('EPR portals · <kbd>T</kbd> to tunnel through walls')}</li>
         </ul>
         <button class="go" type="button" data-act="start">${go}</button>
-        <p class="hint">${touchy ? 'swipe to move' : 'arrows/WASD · space: measure · T: tunnel · P: pause'}</p>
+        <p class="hint">${t(touchy ? 'swipe to move' : 'arrows/WASD · space: measure · T: tunnel · P: pause')}</p>
       </div>`;
     } else if (kind === 'paused') {
-      html = `<div class="card"><div class="big">PAUSED</div>
-        <p>The wavefunction is holding its breath.</p>
-        <button class="go" type="button" data-act="resume">${touchy ? 'TAP TO RESUME' : 'P TO RESUME'}</button></div>`;
+      html = `<div class="card"><div class="big">${t('PAUSED')}</div>
+        <p>${t('The wavefunction is holding its breath.')}</p>
+        <button class="go" type="button" data-act="resume">${t(touchy ? 'TAP TO RESUME' : 'P TO RESUME')}</button></div>`;
     } else if (kind === 'gameover') {
-      html = `<div class="card"><div class="big" style="color:#ff3b5c">GAME OVER</div>
-        <p>Your wavefunction collapsed for good.</p>
+      html = `<div class="card"><div class="big" style="color:#ff3b5c">${t('GAME OVER')}</div>
+        <p>${t('Your wavefunction collapsed for good.')}</p>
         <p class="big">${score}</p>
-        <p>${score >= high && score > 0 ? 'New high score!' : 'High score: ' + high}</p>
-        <button class="go" type="button" data-act="start">${touchy ? 'TAP TO RETRY' : 'ENTER TO RETRY'}</button></div>`;
+        <p>${score >= high && score > 0 ? t('New high score!') : t('High score: {high}', { high })}</p>
+        <button class="go" type="button" data-act="start">${t(touchy ? 'TAP TO RETRY' : 'ENTER TO RETRY')}</button></div>`;
     }
     o.innerHTML = html;
     o.classList.add('show');
@@ -1112,11 +1116,20 @@
 
   function toggleMute() {
     muted = !muted;
-    el.mute.textContent = muted ? '♪ OFF' : '♪ ON';
+    el.mute.textContent = t(muted ? '♪ OFF' : '♪ ON');
     try { localStorage.setItem('quakman-muted', muted ? '1' : '0'); } catch (e) { /* ignore */ }
   }
   try { if (localStorage.getItem('quakman-muted') === '1') toggleMute(); } catch (e) { /* ignore */ }
   el.mute.addEventListener('click', () => { toggleMute(); el.mute.blur(); });
+  el.mute.textContent = t(muted ? '♪ OFF' : '♪ ON');
+
+  if (window.QA) {
+    QA.onChange(() => {
+      el.mute.textContent = t(muted ? '♪ OFF' : '♪ ON');
+      for (const node of [el.probs, ...ghostRows]) { node._v = undefined; node._h = undefined; }
+      if (overlayKind) showOverlay(overlayKind);
+    });
+  }
 
   // --------------------------------------------------------------- input --
   const KEYMAP = {

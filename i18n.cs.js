@@ -1,0 +1,27 @@
+window.QA_CS = {
+  'Quantum Arcade': 'Kvantová herna',
+  'arcade.name': 'KVANTOVÁ HERNA',
+  'arcade.tag': 'Klasické hry přestavěné podle kvantové mechaniky. Najdeš tu superpozici, překlopení fáze, provázání, měření i tunelování, a každé z nich je herní mechanika. Nic tu není víc než <code>(|zábava⟩+|poučení⟩)/√2</code>.',
+  'arcade.play': 'HRÁT ▸',
+  'arcade.footer': 'Statické stránky: žádné sestavování a žádné sledování. Jen canvas a JavaScript.',
+
+  'desc.quak-man': 'Pac-Man jako kvantová částice. Rozděl se na zrcadlové kopie, překlop duchy do jedlého stavu <code>|−⟩</code> a přežij měření s pravděpodobností jako při hodu mincí.',
+  'desc.quetris': 'Tetris s dílky v superpozici, které zkolabují při dopadu. Překlop dílek na antihmotu, která anihiluje kostky, a smaž provázané dvojice najednou.',
+  'desc.minequeeper': 'Hledání min, kde jsou čísla středními hodnotami. Poloviční mina je v superpozici, antimina se počítá jako −1 a změřením pole se z hádání stává zase dedukce.',
+  'desc.breaquot': 'Breakout, kde je míček vlnový balík. Rozděl ho na děliči svazku, překlop mu fázi, nech větve interferovat a chyť tu, kterou pálka naměří jako skutečnou.',
+  'desc.hexxaqon': 'Hexxagon s kvantovými tahy. Rozděl kámen do dvou polí najednou, provaž klony, aby sdílely osud, chraň kameny překlopením fáze a přechytrači AI, která počítá se středními hodnotami.',
+  'desc.lights-qout': 'Logický hlavolam pro jednoho hráče. Každé světlo je qubit. Stisk X nehne se stavy <code>|±⟩</code> a stisk Z se stavy <code>|0⟩/|1⟩</code>, takže každá deska jsou dva hlavolamy spojené pár vzácnými Hadamardy.',
+
+  'chip.superposition': 'superpozice',
+  'chip.phase-flip': 'překlopení fáze',
+  'chip.entanglement': 'provázání',
+  'chip.tunneling': 'tunelování',
+  'chip.annihilation': 'anihilace',
+  'chip.measurement': 'měření',
+  'chip.negative-phase': 'záporná fáze',
+  'chip.interference': 'interference',
+  'chip.x-z-h-gates': 'hradla X / Z / H',
+  'chip.bases': 'báze',
+  'chip.bloch-sphere': 'Blochova sféra',
+  'chip.logic-puzzle': 'logický hlavolam',
+};

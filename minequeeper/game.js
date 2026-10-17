@@ -8,6 +8,7 @@
  * Revealed numbers show the expected signed mine count of the neighbours.
  */
 (() => {
+  const t = (s, v) => (window.QA ? QA.t(s, v) : String(s).replace(/\{(\w+)\}/g, (m, k) => (v && k in v ? v[k] : m)));
   const CS = 32;
   const DIFFS = {
     easy: { cols: 9, rows: 9, classic: 6, anti: 1, sup: 2, ent: 1 },
@@ -244,7 +245,9 @@
       best[diffKey] = secs;
       try { localStorage.setItem('minequeeper-best', JSON.stringify(best)); } catch (e) { /* ignore */ }
     }
-    setStatus(`CLEARED in ${secs}s${prev === undefined || secs < prev ? ', a new best!' : ''} Every wavefunction resolved safely.`, 'win');
+    setStatus(prev === undefined || secs < prev
+      ? 'CLEARED in {secs}s, a new best! Every wavefunction resolved safely.'
+      : 'CLEARED in {secs}s. Every wavefunction resolved safely.', 'win', { secs });
     sfx.win();
   }
 
@@ -400,15 +403,17 @@
     status: $('status'), mute: $('muteBtn'),
   };
   const set = (node, v) => { v = String(v); if (node._v !== v) { node._v = v; node.textContent = v; } };
-  function setStatus(text, cls = '') {
-    el.status.textContent = text;
+  let lastStatus = ['', '', null];
+  function setStatus(text, cls = '', vars = null) {
+    lastStatus = [text, cls, vars];
+    el.status.textContent = t(text, vars);
     el.status.className = 'status' + (cls ? ' ' + cls : '');
   }
   function updateHUD() {
     const total = D.classic + D.anti + D.sup + D.ent;
     set(el.mines, total - flags);
-    const t = !placed ? 0 : Math.floor(((over ? endT : performance.now()) - startT) / 1000);
-    set(el.time, t);
+    const secs = !placed ? 0 : Math.floor(((over ? endT : performance.now()) - startT) / 1000);
+    set(el.time, secs);
     set(el.measures, measures > 8 ? `◆×${measures}` : '◆'.repeat(measures) || '–');
     set(el.best, best[diffKey] === undefined ? '–' : best[diffKey] + 's');
   }
@@ -479,11 +484,12 @@
 
   function toggleMute() {
     muted = !muted;
-    el.mute.textContent = muted ? '♪ OFF' : '♪ ON';
+    el.mute.textContent = muted ? t('♪ OFF') : t('♪ ON');
     try { localStorage.setItem('minequeeper-muted', muted ? '1' : '0'); } catch (e) { /* ignore */ }
   }
   try { if (localStorage.getItem('minequeeper-muted') === '1') toggleMute(); } catch (e) { /* ignore */ }
   el.mute.addEventListener('click', () => { toggleMute(); el.mute.blur(); });
+  el.mute.textContent = muted ? t('♪ OFF') : t('♪ ON');
 
   window.addEventListener('keydown', e => {
     if (e.ctrlKey || e.metaKey || e.altKey) return;
@@ -494,6 +500,11 @@
       case 'Digit3': newGame('hard'); break;
       case 'KeyM': toggleMute(); break;
     }
+  });
+
+  if (window.QA) QA.onChange(() => {
+    setStatus(...lastStatus);
+    el.mute.textContent = muted ? t('♪ OFF') : t('♪ ON');
   });
 
   // -------------------------------------------------------------- loop --

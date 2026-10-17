@@ -7,6 +7,8 @@
  * entanglement id shared with exactly one other piece.
  */
 (() => {
+  const t = (s, v) => (window.QA ? QA.t(s, v) : String(s).replace(/\{(\w+)\}/g, (m, k) => (v && k in v ? v[k] : m)));
+
   // ---------------------------------------------------------- geometry --
   const COLS = 10, ROWS = 22, HIDDEN = 2, CELL = 30;
   const BX = 120, BY = 15, W = 540, H = 630;
@@ -283,7 +285,7 @@
     for (const [c, r] of cellsOf(gone, cur)) if (r >= HIDDEN) burst(c, r, COLORS[gone], 4, 90);
     cur.kinds = [keep];
     const [c0, r0] = cellsOf(keep, cur)[0];
-    popup(c0, Math.max(HIDDEN, r0) - 0.5, `${msg} → |${keep}⟩`, '#7ff9ff');
+    popup(c0, Math.max(HIDDEN, r0) - 0.5, `${t(msg)} → |${keep}⟩`, '#7ff9ff');
     sfx.measure();
   }
 
@@ -310,7 +312,7 @@
 
   function phaseFlip() {
     if (scene !== 'play') return;
-    if (flips <= 0) { popupAtPiece('NO Z FLIPS', '#ff6b8b'); return; }
+    if (flips <= 0) { popupAtPiece(t('NO Z FLIPS'), '#ff6b8b'); return; }
     flips--;
     cur.phase = -cur.phase;
     popupAtPiece(cur.phase < 0 ? 'Z: |+⟩ → |−⟩' : 'Z: |−⟩ → |+⟩', '#ff4fd8');
@@ -324,28 +326,28 @@
 
   function tunnel() {
     if (scene !== 'play') return;
-    if (tunnels <= 0) { popupAtPiece('NO TUNNELS', '#ff6b8b'); return; }
+    if (tunnels <= 0) { popupAtPiece(t('NO TUNNELS'), '#ff6b8b'); return; }
     const y0 = landingY(cur);
-    let t = y0 + 1;
-    while (t < ROWS && !fits(cur, cur.x, t)) t++;
-    if (t >= ROWS) { popupAtPiece('NO WAY THROUGH', '#9690c6'); return; }
+    let ty = y0 + 1;
+    while (ty < ROWS && !fits(cur, cur.x, ty)) ty++;
+    if (ty >= ROWS) { popupAtPiece(t('NO WAY THROUGH'), '#9690c6'); return; }
     tunnels--;
-    const w = t - y0 - 1;
+    const w = ty - y0 - 1;
     const p = Math.exp(-0.6 * w);
     if (Math.random() < p) {
       for (const k of cur.kinds) {
         for (const [c, r] of cellsOf(k, cur)) {
-          for (let rr = Math.max(r, HIDDEN); rr <= r + (t - cur.y); rr += 1) {
+          for (let rr = Math.max(r, HIDDEN); rr <= r + (ty - cur.y); rr += 1) {
             particles.push({ x: cellX(c) + CELL / 2, y: cellY(rr) + CELL / 2, vx: (Math.random() - 0.5) * 40, vy: 30, t: -(rr - r) * 0.015, life: 0.5, color: '#ffe14d' });
           }
         }
       }
-      cur.y = t;
+      cur.y = ty;
       lockT = 0;
-      popupAtPiece(`TUNNELED (${Math.round(p * 100)}%)`, '#ffe14d');
+      popupAtPiece(t('TUNNELED ({p}%)', { p: Math.round(p * 100) }), '#ffe14d');
       sfx.tunnel();
     } else {
-      popupAtPiece(`REFLECTED (${Math.round(p * 100)}%)`, '#ff6b8b');
+      popupAtPiece(t('REFLECTED ({p}%)', { p: Math.round(p * 100) }), '#ff6b8b');
       sfx.reflect();
     }
   }
@@ -403,14 +405,14 @@
       while (board.length < ROWS) board.unshift(emptyRow());
       const n = full.length;
       addScore(LINE_SCORE[n] * level);
-      popup(4.5, full[full.length - 1] - 1, n === 4 ? 'QUETRIS!' : ['', 'SINGLE', 'DOUBLE', 'TRIPLE'][n], n === 4 ? '#ffe14d' : '#7ff9ff', 1.4);
+      popup(4.5, full[full.length - 1] - 1, t(['', 'SINGLE', 'DOUBLE', 'TRIPLE', 'QUETRIS!'][n]), n === 4 ? '#ffe14d' : '#7ff9ff', 1.4);
       sfx.line(n);
       const before = Math.floor(lines / 5);
       lines += n;
       const gained = Math.floor(lines / 5) - before;
       if (gained) { flips = Math.min(MAX_CHARGES, flips + gained); tunnels = Math.min(MAX_CHARGES, tunnels + gained); }
       const newLevel = Math.floor(lines / 10) + 1;
-      if (newLevel > level) { level = newLevel; popup(4.5, 10, 'LEVEL ' + level, '#ffe14d', 1.6); sfx.level(); }
+      if (newLevel > level) { level = newLevel; popup(4.5, 10, t('LEVEL {n}', { n: level }), '#ffe14d', 1.6); sfx.level(); }
     }
 
     // Spooky action: a measured entangled cell takes its whole pair with it.
@@ -431,7 +433,7 @@
     }
     if (spooky) {
       addScore(50 * spooky * level);
-      popup(4.5, 8, `SPOOKY ACTION ×${spooky}`, '#ffb0d8', 1.5);
+      popup(4.5, 8, t('SPOOKY ACTION ×{n}', { n: spooky }), '#ffb0d8', 1.5);
       sfx.spooky();
     }
 
@@ -659,7 +661,7 @@
       ctx.fillStyle = '#9690c6';
       ctx.font = '8px "Press Start 2P", monospace';
       ctx.textAlign = 'left'; ctx.textBaseline = 'top';
-      ctx.fillText(label, x + 8, y + 8);
+      ctx.fillText(t(label), x + 8, y + 8);
     }
   }
 
@@ -697,11 +699,11 @@
       info.push([cur.phase > 0 ? 'phase |+⟩' : 'phase |−⟩', cur.phase > 0 ? '#e8e5ff' : '#ff4fd8']);
       info.push([cur.e !== null ? 'entangled' : 'separable', cur.e !== null ? ENT_COLORS[cur.e % ENT_COLORS.length] : '#9690c6']);
     }
-    info.forEach(([t, c], i) => { ctx.fillStyle = c; ctx.fillText(t, 20, BY + 132 + i * 22); });
+    info.forEach(([txt, c], i) => { ctx.fillStyle = c; ctx.fillText(t(txt), 20, BY + 132 + i * 22); });
     ctx.font = '8px "Press Start 2P", monospace';
     ctx.fillStyle = '#9690c6';
-    ctx.fillText('Z FLIPS', 20, BY + 210);
-    ctx.fillText('TUNNELS', 20, BY + 262);
+    ctx.fillText(t('Z FLIPS'), 20, BY + 210);
+    ctx.fillText(t('TUNNELS'), 20, BY + 262);
     ctx.font = '14px "JetBrains Mono", monospace';
     ctx.fillStyle = '#ff4fd8';
     ctx.fillText('◆'.repeat(flips), 20, BY + 226);
@@ -764,48 +766,50 @@
   function updateHUD() {
     set(el.score, score); set(el.lines, lines); set(el.level, level); set(el.high, high);
     set(el.flips, pips(flips)); set(el.tunnels, pips(tunnels));
-    if (!cur) { set(el.ket, '|ψ⟩ = ∅'); set(el.probs, 'no piece in play'); return; }
+    if (!cur) { set(el.ket, '|ψ⟩ = ∅'); set(el.probs, t('no piece in play')); return; }
     const sign = cur.phase > 0 ? '' : '−';
     const ket = cur.kinds.length > 1
       ? `|ψ⟩ = ${sign}(|${cur.kinds[0]}⟩ + |${cur.kinds[1]}⟩)/√2`
       : `|ψ⟩ = ${sign}|${cur.kinds[0]}⟩`;
     set(el.ket, ket);
     const bits = [];
-    bits.push(cur.kinds.length > 1 ? `P(${cur.kinds[0]}) = P(${cur.kinds[1]}) = 50%` : 'definite shape');
-    bits.push(cur.phase > 0 ? 'matter' : 'antimatter: annihilates |+⟩ below');
-    if (cur.e !== null) bits.push(cur.h === 0 ? 'entangled with the next piece' : 'entangled with a placed piece');
+    bits.push(cur.kinds.length > 1 ? `P(${cur.kinds[0]}) = P(${cur.kinds[1]}) = 50%` : t('definite shape'));
+    bits.push(t(cur.phase > 0 ? 'matter' : 'antimatter: annihilates |+⟩ below'));
+    if (cur.e !== null) bits.push(t(cur.h === 0 ? 'entangled with the next piece' : 'entangled with a placed piece'));
     set(el.probs, bits.join(' · '));
   }
 
   // ----------------------------------------------------------- overlay --
   const touchy = window.matchMedia && matchMedia('(pointer: coarse)').matches;
+  let overlayKind = null;
   function showOverlay(kind) {
     const o = el.overlay;
+    overlayKind = kind;
     if (!kind) { o.classList.remove('show'); o.innerHTML = ''; return; }
     let html = '';
     if (kind === 'title') {
       html = `<div class="card">
         <div class="card-logo"><b>|</b>QUETRIS<b>⟩</b></div>
-        <p>Stack and clear lines as usual, but each piece is a wavefunction that only becomes definite when it's measured.</p>
+        <p>${t("Stack and clear lines as usual, but each piece is a wavefunction that only becomes definite when it's measured.")}</p>
         <ul class="mini">
-          <li><span class="sym sup">⊕</span>Superposed pieces collapse on contact</li>
-          <li><span class="gate z">Z</span>Flip to |−⟩ antimatter to annihilate blocks</li>
-          <li><span class="sym wave">〰</span>Clear part of an entangled pair and it all goes</li>
-          <li><span class="sym">⇣</span><kbd>T</kbd> tunnels through overhangs</li>
+          <li><span class="sym sup">⊕</span>${t('Superposed pieces collapse on contact')}</li>
+          <li><span class="gate z">Z</span>${t('Flip to |−⟩ antimatter to annihilate blocks')}</li>
+          <li><span class="sym wave">〰</span>${t('Clear part of an entangled pair and it all goes')}</li>
+          <li><span class="sym">⇣</span>${t('<kbd>T</kbd> tunnels through overhangs')}</li>
         </ul>
-        <button class="go" type="button" data-act="start">${touchy ? 'TAP TO START' : 'PRESS ENTER'}</button>
-        <p class="hint">${touchy ? 'use the buttons below the board' : '←→ move · ↑ rotate · space drop · C hold · F flip · Q measure · T tunnel'}</p>
+        <button class="go" type="button" data-act="start">${t(touchy ? 'TAP TO START' : 'PRESS ENTER')}</button>
+        <p class="hint">${t(touchy ? 'use the buttons below the board' : '←→ move · ↑ rotate · space drop · C hold · F flip · Q measure · T tunnel')}</p>
       </div>`;
     } else if (kind === 'paused') {
-      html = `<div class="card"><div class="big">PAUSED</div>
-        <p>The wavefunction is holding its breath.</p>
-        <button class="go" type="button" data-act="resume">${touchy ? 'TAP TO RESUME' : 'P TO RESUME'}</button></div>`;
+      html = `<div class="card"><div class="big">${t('PAUSED')}</div>
+        <p>${t('The wavefunction is holding its breath.')}</p>
+        <button class="go" type="button" data-act="resume">${t(touchy ? 'TAP TO RESUME' : 'P TO RESUME')}</button></div>`;
     } else if (kind === 'gameover') {
-      html = `<div class="card"><div class="big" style="color:#ff3b5c">GAME OVER</div>
-        <p>The stack decohered into the ceiling.</p>
+      html = `<div class="card"><div class="big" style="color:#ff3b5c">${t('GAME OVER')}</div>
+        <p>${t('The stack decohered into the ceiling.')}</p>
         <p class="big">${score}</p>
-        <p>${lines} lines · level ${level} · ${score >= high && score > 0 ? 'new high score!' : 'high score ' + high}</p>
-        <button class="go" type="button" data-act="start">${touchy ? 'TAP TO RETRY' : 'ENTER TO RETRY'}</button></div>`;
+        <p>${t('{lines} lines · level {level}', { lines, level })} · ${score >= high && score > 0 ? t('new high score!') : t('high score {high}', { high })}</p>
+        <button class="go" type="button" data-act="start">${t(touchy ? 'TAP TO RETRY' : 'ENTER TO RETRY')}</button></div>`;
     }
     o.innerHTML = html;
     o.classList.add('show');
@@ -840,11 +844,20 @@
 
   function toggleMute() {
     muted = !muted;
-    el.mute.textContent = muted ? '♪ OFF' : '♪ ON';
+    el.mute.textContent = t(muted ? '♪ OFF' : '♪ ON');
     try { localStorage.setItem('quetris-muted', muted ? '1' : '0'); } catch (e) { /* ignore */ }
   }
   try { if (localStorage.getItem('quetris-muted') === '1') toggleMute(); } catch (e) { /* ignore */ }
   el.mute.addEventListener('click', () => { toggleMute(); el.mute.blur(); });
+  el.mute.textContent = t(muted ? '♪ OFF' : '♪ ON');
+
+  if (window.QA) {
+    QA.onChange(() => {
+      el.mute.textContent = t(muted ? '♪ OFF' : '♪ ON');
+      el.probs._v = undefined;
+      if (overlayKind) showOverlay(overlayKind);
+    });
+  }
 
   // ------------------------------------------------------------- input --
   window.addEventListener('keydown', e => {

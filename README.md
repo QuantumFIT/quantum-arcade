@@ -2,7 +2,7 @@
 
 Classic computer games rebuilt around quantum mechanics: superposition, phase flips, entanglement, measurement and tunneling, each turned into a game mechanic. Every game is a static page with no build step: plain HTML, CSS and canvas JavaScript.
 
-**Play:** <https://ondrik.github.io/quantum-arcade/>
+**Play:** <https://quantum.fit.vut.cz/quantum-arcade/>
 
 | Game | Folder | Quantum twist |
 |---|---|---|

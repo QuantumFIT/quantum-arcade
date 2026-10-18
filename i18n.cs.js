@@ -10,6 +10,7 @@ window.QA_CS = {
   'desc.minequeeper': 'Hledání min, kde jsou čísla středními hodnotami. Poloviční mina je v superpozici, antimina se počítá jako −1 a změřením pole se z hádání stává zase dedukce.',
   'desc.breaquot': 'Breakout, kde je míček vlnový balík. Rozděl ho na děliči svazku, překlop mu fázi, nech větve interferovat a chyť tu, kterou pálka naměří jako skutečnou.',
   'desc.hexxaqon': 'Hexxagon s kvantovými tahy. Rozděl kámen do dvou polí najednou, provaž klony, aby sdílely osud, chraň kameny překlopením fáze a přechytrači AI, která počítá se středními hodnotami.',
+  'desc.qunairo': 'Logický hlavolam, který začíná jako klasické binairo s nulami a jedničkami a rozroste se na celou Blochovu sféru. Vyvaž každý řádek na každé ose a čti nápovědy: <code>○</code> stejné, <code>●</code> opačné, <code>◐</code> nestranné, tedy překryv, jaký žádný klasický bit mít nemůže.',
   'desc.lights-qout': 'Logický hlavolam pro jednoho hráče. Každé světlo je qubit. Stisk X nehne se stavy <code>|±⟩</code> a stisk Z se stavy <code>|0⟩/|1⟩</code>, takže každá deska jsou dva hlavolamy spojené pár vzácnými Hadamardy.',
 
   'chip.superposition': 'superpozice',
@@ -24,4 +25,5 @@ window.QA_CS = {
   'chip.bases': 'báze',
   'chip.bloch-sphere': 'Blochova sféra',
   'chip.logic-puzzle': 'logický hlavolam',
+  'chip.overlap': 'překryv',
 };

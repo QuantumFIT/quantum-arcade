@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Qunairo · quantum binairo</title>
+  <meta name="description" content="Qunairo: a quantum Takuzu/Binairo logic puzzle. Fill the grid with Bloch-sphere states so every row and column is balanced, using overlap clues between neighbours.">
+  <meta name="theme-color" content="#05040f">
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Press+Start+2P&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="top">
+    <a class="back" href="../" data-i18n="qn.back">← quantum arcade</a>
+    <h1 class="logo"><span class="bra">|</span>QUNAIRO<span class="ket">⟩</span></h1>
+    <p class="sub" data-i18n="qn.sub">binairo, but every bit gets a whole Bloch sphere</p>
+  </header>
+
+  <main class="app">
+    <section class="stage-col">
+      <div class="toolbar">
+        <div class="seg">
+          <button type="button" id="levelsBtn" data-i18n="qn.levels">LEVELS</button>
+          <button type="button" id="prevBtn">◀</button>
+          <button type="button" id="nextBtn">▶</button>
+        </div>
+        <div class="seg">
+          <button type="button" id="undoBtn" data-i18n="qn.undo">UNDO</button>
+          <button type="button" id="resetBtn" data-i18n="qn.reset">RESET</button>
+        </div>
+      </div>
+      <div class="hud">
+        <div><span class="lbl" data-i18n="qn.level">LEVEL</span><span id="level" class="val">1</span></div>
+        <div><span class="lbl" data-i18n="qn.chapter">CHAPTER</span><span id="chapter" class="val chap">I</span></div>
+        <div><span class="lbl" data-i18n="qn.time">TIME</span><span id="time" class="val">0</span></div>
+        <div class="right"><span class="lbl" data-i18n="qn.measures">MEASUREMENTS</span><span id="measures" class="val mcount">3</span></div>
+      </div>
+      <div id="status" class="status"></div>
+      <div class="stage" id="stage">
+        <canvas id="game" aria-label="Qunairo board" data-i18n-aria="qn.aria"></canvas>
+        <div id="overlay" class="overlay"></div>
+      </div>
+      <div id="tally" class="tally"></div>
+      <div class="palette" id="palette"></div>
+      <div class="moves">
+        <div class="seg" id="measureSeg"></div>
+        <button id="muteBtn" class="chip" type="button">♪ ON</button>
+      </div>
+    </section>
+
+    <aside class="panel">
+      <h2 data-i18n="qn.h.rules">Rules</h2>
+      <ul class="legend">
+        <li><span class="sym num">⚖</span><div data-i18n="qn.r.balance"><b>Balance.</b> In every row and column, each axis of the Bloch sphere has as many states at one end as at the other: as many <code>|0⟩</code> as <code>|1⟩</code>, as many <code>|+⟩</code> as <code>|−⟩</code>, as many <code>|+i⟩</code> as <code>|−i⟩</code>. The row's average state is then the centre of the sphere.</div></li>
+        <li><span class="sym">≢</span><div data-i18n="qn.r.three"><b>No three alike.</b> No three identical states may sit next to each other in a row or column.</div></li>
+        <li><span class="sym">○</span><div data-i18n="qn.r.same"><b>○ identical</b>: the two neighbours are the same state, overlap <code>|⟨a|b⟩|² = 1</code>.</div></li>
+        <li><span class="sym">●</span><div data-i18n="qn.r.opp"><b>● opposite</b>: the two ends of one axis, like <code>|0⟩</code> and <code>|1⟩</code>, overlap <code>0</code>.</div></li>
+        <li><span class="sym">◐</span><div data-i18n="qn.r.half"><b>◐ unbiased</b>: on different axes, like <code>|0⟩</code> and <code>|+⟩</code>, overlap <code>½</code>. Classical bits never have this relation: two bits are either equal or opposite.</div></li>
+      </ul>
+
+      <h2 data-i18n="qn.h.states">The states</h2>
+      <ul class="legend states">
+        <li><span class="st s0">↑</span><div data-i18n="qn.s.z"><code>|0⟩</code> up and <code>|1⟩</code> down: the Z axis, the only one a classical bit has.</div></li>
+        <li><span class="st s2">→</span><div data-i18n="qn.s.x"><code>|+⟩</code> right and <code>|−⟩</code> left: the X axis, on the equator.</div></li>
+        <li><span class="st s4">⊙</span><div data-i18n="qn.s.y"><code>|+i⟩</code> toward you (⊙) and <code>|−i⟩</code> away from you (⊗): the Y axis.</div></li>
+      </ul>
+
+      <h2 data-i18n="qn.h.measure">Measurement hints</h2>
+      <p class="note" data-i18n="qn.measure.note">You can measure a cell along an axis, at most 3 times per puzzle. The puzzle keeps the original state, and you measure a copy. If the state lies on that axis, you always get its own pole. If it doesn't, you get a random 50/50 result. Either way the answer only rules out the <i>opposite</i> pole. That's all one measurement of a qubit can tell you.</p>
+
+      <h2 data-i18n="qn.h.controls">Controls</h2>
+      <ul class="keys">
+        <li data-i18n="qn.k.paint">pick a state, then <kbd>click</kbd> cells · click again or <kbd>right-click</kbd> to clear</li>
+        <li data-i18n="qn.k.keys"><kbd>←↑↓→</kbd> move · <kbd>1</kbd>–<kbd>6</kbd> place a state · <kbd>0</kbd> clear</li>
+        <li data-i18n="qn.k.more"><kbd>U</kbd> undo · <kbd>R</kbd> reset · <kbd>N</kbd>/<kbd>P</kbd> next/previous level · <kbd>M</kbd> mute</li>
+      </ul>
+    </aside>
+  </main>
+
+  <footer data-i18n="qn.footer">Static page: no build step and no tracking. Plain canvas and JavaScript.</footer>
+  <script src="engine.js"></script>
+  <script src="i18n.cs.js"></script>
+  <script src="../i18n.js"></script>
+  <script src="game.js"></script>
+</body>
+</html>

@@ -12,6 +12,7 @@ Classic computer games rebuilt around quantum mechanics: superposition, phase fl
 | **Breaquot** | [`breaquot/`](breaquot/) | Breakout: the ball is a wave packet split by beam splitters and steel barriers it can tunnel through, phase plates, interference, a paddle that measures |
 | **Hexxaqon** | [`hexxaqon/`](hexxaqon/) | Hexxagon: pieces split into superpositions that collapse when observed (and capture on landing), interference, entangled clones, Z-shields; vs. an expectation-value AI or a friend |
 | **Lights Qout** | [`lights-qout/`](lights-qout/) | Lights Out logic puzzle: every cell is a qubit in `|0⟩ |1⟩ |+⟩ |−⟩`; X and Z presses act on crosses, Hadamards on single cells; 16 levels plus endless random puzzles |
+| **Qunairo** | [`qunairo/`](qunairo/) | Takuzu/Binairo logic puzzle that grows from 0/1 bits to the six Bloch-sphere poles: every row and column balanced on every axis, overlap clues ○ ● ◐ between neighbours, honest measurement hints; 18 deduction-checked levels plus random ones |
 
 Each game's page lists its full rules and controls in a side panel.
 

@@ -12,6 +12,7 @@ window.QA_CS = {
   'desc.hexxaqon': 'Hexxagon s kvantovými tahy. Rozděl kámen do dvou polí najednou, provaž klony, aby sdílely osud, chraň kameny překlopením fáze a přechytrači AI, která počítá se středními hodnotami.',
   'desc.qunairo': 'Logický hlavolam, který začíná jako klasické binairo s nulami a jedničkami a rozroste se na celou Blochovu sféru. Vyvaž každý řádek na každé ose a čti nápovědy: <code>○</code> stejné, <code>●</code> opačné, <code>◐</code> nestranné, tedy překryv, jaký žádný klasický bit mít nemůže.',
   'desc.qu2048': '2048, kde má každá dlaždice fázi. Stejné dlaždice se stejnou fází se spojí, s opačnou fází se anihilují, dlaždice Z překlápí fázi a dlaždice H rozdělí dlaždici na <code>|v⟩</code> a <code>−|v⟩</code>. Růst, nebo rušit?',
+  'desc.quattleship': 'Lodě s Elitzurovým–Vaidmanovým testem bomb. Zenonovy sondy najdou loď bez dotyku a čím víc kroků, tím jsou tišší. Foton pohlcený lodí tě ale prozradí a přitáhne palbu navíc.',
   'desc.lights-qout': 'Logický hlavolam pro jednoho hráče. Každé světlo je qubit. Stisk X nehne se stavy <code>|±⟩</code> a stisk Z se stavy <code>|0⟩/|1⟩</code>, takže každá deska jsou dva hlavolamy spojené pár vzácnými Hadamardy.',
 
   'chip.superposition': 'superpozice',
@@ -28,4 +29,7 @@ window.QA_CS = {
   'chip.logic-puzzle': 'logický hlavolam',
   'chip.overlap': 'překryv',
   'chip.amplitudes': 'amplitudy',
+  'chip.zeno-effect': 'Zenonův jev',
+  'chip.interaction-free': 'měření bez interakce',
+  'chip.strategy': 'strategie',
 };

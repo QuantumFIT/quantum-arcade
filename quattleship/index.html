@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Quattleship · quantum battleship</title>
+  <meta name="description" content="Quattleship: Battleship with Elitzur–Vaidman interaction-free measurement. Find enemy ships with Zeno probes that never touch them, or give yourself away.">
+  <meta name="theme-color" content="#05040f">
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Press+Start+2P&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="top">
+    <a class="back" href="../" data-i18n="qs.back">← quantum arcade</a>
+    <h1 class="logo"><span class="bra">|</span>QUATTLESHIP<span class="ket">⟩</span></h1>
+    <p class="sub" data-i18n="qs.sub">battleship, where you can see a ship without touching it</p>
+  </header>
+
+  <main class="app">
+    <section class="stage-col">
+      <div class="toolbar">
+        <div class="seg">
+          <button type="button" id="newBtn" data-i18n="qs.new">NEW GAME</button>
+          <button type="button" id="shuffleBtn" data-i18n="qs.shuffle">SHUFFLE MY FLEET</button>
+        </div>
+        <button id="muteBtn" class="chip" type="button">♪ ON</button>
+      </div>
+      <div class="hud">
+        <div><span class="lbl" data-i18n="qs.turn">TURN</span><span id="turn" class="val">1</span></div>
+        <div><span class="lbl" data-i18n="qs.energy">ENERGY</span><span id="energy" class="val en">12</span></div>
+        <div><span class="lbl" data-i18n="qs.alarm">ALARM</span><span class="alarm"><span id="alarmBar"></span></span><span id="alarmTxt" class="alarmtxt"></span></div>
+        <div class="right"><span class="lbl" data-i18n="qs.enemy">ENEMY</span><span id="enemyLeft" class="val">5</span></div>
+      </div>
+      <div id="status" class="status"></div>
+      <div class="stage" id="stage">
+        <canvas id="enemy" aria-label="Enemy waters" data-i18n-aria="qs.aria.enemy"></canvas>
+        <div id="overlay" class="overlay"></div>
+      </div>
+      <div class="controls">
+        <div class="seg" id="modes">
+          <button type="button" data-mode="probe" class="on" data-i18n="qs.m.probe">〰 ZENO PROBE</button>
+          <button type="button" data-mode="torpedo" data-i18n="qs.m.torpedo">💣 TORPEDO</button>
+        </div>
+        <div class="nrow" id="nrow">
+          <label for="nSlider" class="lbl" data-i18n="qs.steps">ZENO STEPS N</label>
+          <input type="range" id="nSlider" min="1" max="10" value="6">
+          <span id="nVal" class="nval">6</span>
+        </div>
+        <div id="odds" class="odds"></div>
+      </div>
+    </section>
+
+    <aside class="panel">
+      <h2 data-i18n="qs.h.photon">The photon</h2>
+      <div class="photon">
+        <canvas id="photon" width="150" height="150" aria-hidden="true"></canvas>
+        <div id="photonTxt" class="photontxt"></div>
+      </div>
+
+      <h2 data-i18n="qs.h.mine">Your fleet</h2>
+      <canvas id="mine" class="mine" aria-label="Your fleet" data-i18n-aria="qs.aria.mine"></canvas>
+
+      <h2 data-i18n="qs.h.how">How it works</h2>
+      <ul class="legend">
+        <li><span class="sym">💣</span><div data-i18n="qs.r.torpedo"><b>Torpedo:</b> one per turn, and it ends your turn. It's the only way to sink ships, and a miss wastes the turn.</div></li>
+        <li><span class="sym wave">〰</span><div data-i18n="qs.r.probe"><b>Zeno probe:</b> as many as your energy allows, each costing N. A photon starts in <code>|0⟩</code> and is turned towards <code>|1⟩</code> in N small steps of <code>π/2N</code>, passing the cell after each step.</div></li>
+        <li><span class="sym">○</span><div data-i18n="qs.r.water"><b>Water:</b> nothing disturbs the photon, it ends up in <code>|1⟩</code>, and the detector says "empty". This is always safe.</div></li>
+        <li><span class="sym">◆</span><div data-i18n="qs.r.ship"><b>Ship:</b> each pass is a measurement. Usually it knocks the photon back to <code>|0⟩</code>, the quantum Zeno effect, and the detector says "ship" although nothing touched it. This happens with probability <code>cos²ᴺ(π/2N)</code>.</div></li>
+        <li><span class="sym">!</span><div data-i18n="qs.r.absorb"><b>Absorbed:</b> with the remaining probability the ship absorbs the photon. You still learn "ship", but the enemy notices you: <b>alarm +4</b>.</div></li>
+        <li><span class="sym">⚠</span><div data-i18n="qs.r.alarm"><b>Alarm:</b> the enemy fires 1 shot per turn, plus 1 more for every 4 points of alarm. The alarm cools down by 1 each turn.</div></li>
+        <li><span class="sym num">N</span><div data-i18n="qs.r.n"><b>N = 1</b> is a plain classical touch, absorbed every time it finds a ship. Large N is nearly invisible but expensive. This is the Elitzur–Vaidman bomb tester.</div></li>
+      </ul>
+    </aside>
+  </main>
+
+  <footer data-i18n="qs.footer">Static page: no build step and no tracking. Plain canvas and JavaScript.</footer>
+  <script src="engine.js"></script>
+  <script src="i18n.cs.js"></script>
+  <script src="../i18n.js"></script>
+  <script src="game.js"></script>
+</body>
+</html>

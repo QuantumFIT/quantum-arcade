@@ -11,6 +11,7 @@ window.QA_CS = {
   'desc.breaquot': 'Breakout, kde je míček vlnový balík. Rozděl ho na děliči svazku, překlop mu fázi, nech větve interferovat a chyť tu, kterou pálka naměří jako skutečnou.',
   'desc.hexxaqon': 'Hexxagon s kvantovými tahy. Rozděl kámen do dvou polí najednou, provaž klony, aby sdílely osud, chraň kameny překlopením fáze a přechytrači AI, která počítá se středními hodnotami.',
   'desc.qunairo': 'Logický hlavolam, který začíná jako klasické binairo s nulami a jedničkami a rozroste se na celou Blochovu sféru. Vyvaž každý řádek na každé ose a čti nápovědy: <code>○</code> stejné, <code>●</code> opačné, <code>◐</code> nestranné, tedy překryv, jaký žádný klasický bit mít nemůže.',
+  'desc.qu2048': '2048, kde má každá dlaždice fázi. Stejné dlaždice se stejnou fází se spojí, s opačnou fází se anihilují, dlaždice Z překlápí fázi a dlaždice H rozdělí dlaždici na <code>|v⟩</code> a <code>−|v⟩</code>. Růst, nebo rušit?',
   'desc.lights-qout': 'Logický hlavolam pro jednoho hráče. Každé světlo je qubit. Stisk X nehne se stavy <code>|±⟩</code> a stisk Z se stavy <code>|0⟩/|1⟩</code>, takže každá deska jsou dva hlavolamy spojené pár vzácnými Hadamardy.',
 
   'chip.superposition': 'superpozice',
@@ -26,4 +27,5 @@ window.QA_CS = {
   'chip.bloch-sphere': 'Blochova sféra',
   'chip.logic-puzzle': 'logický hlavolam',
   'chip.overlap': 'překryv',
+  'chip.amplitudes': 'amplitudy',
 };

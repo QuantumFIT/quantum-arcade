@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Qu2048 · 2048 with phases</title>
+  <meta name="description" content="Qu2048: 2048 where every tile has a phase. Equal tiles with the same phase merge, opposite phases annihilate. Z tiles flip phases, H tiles split tiles in two.">
+  <meta name="theme-color" content="#05040f">
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Press+Start+2P&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="top">
+    <a class="back" href="../" data-i18n="q2.back">← quantum arcade</a>
+    <h1 class="logo"><span class="bra">|</span>QU2048<span class="ket">⟩</span></h1>
+    <p class="sub" data-i18n="q2.sub">2048, where every tile is an amplitude with a phase</p>
+  </header>
+
+  <main class="app">
+    <section class="stage-col">
+      <div class="toolbar">
+        <div class="seg">
+          <button type="button" id="newBtn" data-i18n="q2.new">NEW GAME</button>
+          <button type="button" id="undoBtn" data-i18n="q2.undo">UNDO</button>
+        </div>
+        <button id="muteBtn" class="chip" type="button">♪ ON</button>
+      </div>
+      <div class="hud">
+        <div><span class="lbl" data-i18n="q2.score">SCORE</span><span id="score" class="val">0</span></div>
+        <div><span class="lbl" data-i18n="q2.best">BEST</span><span id="best" class="val">0</span></div>
+        <div><span class="lbl" data-i18n="q2.max">MAX</span><span id="maxTile" class="val tilev">2</span></div>
+        <div class="right"><span class="lbl" data-i18n="q2.annih">ANNIHIL.</span><span id="annih" class="val mag">0</span></div>
+      </div>
+      <div id="status" class="status"></div>
+      <div class="stage" id="stage">
+        <canvas id="game" aria-label="Qu2048 board" data-i18n-aria="q2.aria"></canvas>
+        <div id="overlay" class="overlay"></div>
+      </div>
+      <p class="hintline" data-i18n="q2.hint">arrows / WASD / swipe to slide every tile</p>
+    </section>
+
+    <aside class="panel">
+      <h2 data-i18n="q2.h.rules">Interference rules</h2>
+      <ul class="legend">
+        <li><span class="sym num">+</span><div data-i18n="q2.r.merge"><b>Constructive.</b> Two equal tiles with the <b>same phase</b> merge into the next value: <code>|8⟩ + |8⟩ → |16⟩</code>, and likewise for two <code>−</code> tiles.</div></li>
+        <li><span class="sym">✕</span><div data-i18n="q2.r.annih"><b>Destructive.</b> Two equal tiles with <b>opposite phases</b> cancel out, <code>|8⟩ − |8⟩ = 0</code>. Both vanish, you get points for the released energy, and the board gets space.</div></li>
+        <li><span class="gate z">Z</span><div data-i18n="q2.r.z"><b>Z tile.</b> Push any tile into it, or it into a tile, and that tile's phase flips: <code>Z|v⟩ = −|v⟩</code>. The Z tile is used up.</div></li>
+        <li><span class="gate h">H</span><div data-i18n="q2.r.h"><b>H tile.</b> It splits a tile of 4 or more into two halves with opposite phases, <code>|2v⟩ → |v⟩, −|v⟩</code>. The <code>−</code> half appears in a free cell. Good for building the anti-tile that cancels a blocker.</div></li>
+        <li><span class="sym">⚠</span><div data-i18n="q2.r.danger"><b>Careful:</b> <code>−</code> tiles merge with each other too. A big <code>−|64⟩</code> can wipe out your <code>|64⟩</code>.</div></li>
+        <li><span class="sym">★</span><div data-i18n="q2.r.goal"><b>Goal:</b> make a <code>|2048⟩</code>. Either phase counts, because a global phase can't be measured.</div></li>
+      </ul>
+
+      <h2 data-i18n="q2.h.spawn">What appears</h2>
+      <p class="note" data-i18n="q2.spawn">After every move a <code>|2⟩</code> appears, sometimes a <code>|4⟩</code>, and about one time in eight with phase <code>−</code>. From 300 points a Z tile can turn up, and once you have a 128, an H tile. There is at most one of each on the board.</p>
+
+      <h2 data-i18n="q2.h.controls">Controls</h2>
+      <ul class="keys">
+        <li data-i18n="q2.k.move"><kbd>←↑↓→</kbd>/<kbd>WASD</kbd> or swipe: slide</li>
+        <li data-i18n="q2.k.more"><kbd>U</kbd> undo the last move (3 per game) · <kbd>N</kbd> new game · <kbd>M</kbd> mute</li>
+      </ul>
+    </aside>
+  </main>
+
+  <footer data-i18n="q2.footer">Static page: no build step and no tracking. Plain canvas and JavaScript.</footer>
+  <script src="i18n.cs.js"></script>
+  <script src="../i18n.js"></script>
+  <script src="game.js"></script>
+</body>
+</html>

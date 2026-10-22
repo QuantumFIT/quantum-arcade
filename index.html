@@ -91,6 +91,33 @@
       margin-top: 4px;
     }
     footer { text-align: center; color: var(--muted); font-size: 11px; padding: 0 16px 28px; }
+    .best { font-size: 11.5px; color: var(--yellow); min-height: 15px; }
+    .best.none { color: var(--muted); }
+    .records {
+      max-width: 1040px; margin: 0 auto 36px; padding: 0 16px;
+    }
+    .records-card {
+      background: rgba(12, 10, 34, .78); border: 1px solid var(--line); border-radius: 14px; padding: 18px 20px;
+    }
+    .records h2 { font-family: var(--pixel); font-size: 13px; color: var(--cyan); margin: 0 0 6px; }
+    .records .lead { color: var(--muted); font-size: 12.5px; margin: 0 0 14px; }
+    .rec-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 10px 22px; }
+    .rec-game { border-top: 1px solid var(--line); padding-top: 8px; }
+    .rec-game h3 { font-family: var(--pixel); font-size: 10px; color: var(--yellow); margin: 0 0 6px; }
+    .rec-game table { width: 100%; border-collapse: collapse; font-size: 12px; }
+    .rec-game td { padding: 2px 0; color: var(--muted); }
+    .rec-game td.v { color: var(--text); text-align: right; font-weight: 700; white-space: nowrap; }
+    .rec-game td.d { text-align: right; font-size: 10.5px; width: 82px; }
+    .rec-game .empty { color: var(--muted); font-size: 12px; }
+    .rec-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 16px; align-items: center; }
+    .rec-actions button {
+      font-family: var(--pixel); font-size: 9px; color: var(--text); background: #120f33;
+      border: 1px solid var(--line); border-radius: 8px; padding: 10px 12px; cursor: pointer;
+    }
+    .rec-actions button:hover { border-color: var(--violet); }
+    .rec-actions button.danger { color: #ff6b8b; }
+    .rec-msg { font-size: 12px; color: var(--muted); }
+    html:lang(cs) .rec-actions button { font-family: var(--mono); font-weight: 700; font-size: 11px; }
   </style>
 </head>
 <body>
@@ -472,8 +499,106 @@
     </a>
   </main>
 
+  <section class="records" id="records">
+    <div class="records-card">
+      <h2 data-i18n="rec.title">My records</h2>
+      <p class="lead" data-i18n="rec.lead">Your best results in every game. They're stored only in this browser. To move them to another device, export them to a file and import it there.</p>
+      <div class="rec-grid" id="recGrid"></div>
+      <div class="rec-actions">
+        <button type="button" id="recExport" data-i18n="rec.export">EXPORT</button>
+        <button type="button" id="recImport" data-i18n="rec.import">IMPORT</button>
+        <button type="button" id="recReset" class="danger" data-i18n="rec.reset">RESET</button>
+        <input type="file" id="recFile" accept="application/json,.json" hidden>
+        <span class="rec-msg" id="recMsg" aria-live="polite"></span>
+      </div>
+    </div>
+  </section>
+
   <footer data-i18n="arcade.footer">Static pages: no build step and no tracking. Plain canvas and JavaScript.</footer>
   <script src="i18n.cs.js"></script>
   <script src="i18n.js"></script>
+  <script src="records.js"></script>
+  <script>
+    (() => {
+      const t = (s, v) => (window.QA ? QA.t(s, v) : s.replace(/\{(\w+)\}/g, (m, k) => (v && k in v ? v[k] : m)));
+      // Which records each game shows: [key, label, unit]. The first two
+      // present go on the game's card.
+      const SHOW = {
+        'quak-man': [['highScore', 'best score'], ['bestLevel', 'best level'], ['games', 'games played']],
+        'quetris': [['highScore', 'best score'], ['mostLines', 'most lines'], ['bestLevel', 'best level'], ['games', 'games played']],
+        'minequeeper': [['bestTime.easy', 'best time, easy', 's'], ['bestTime.normal', 'best time, normal', 's'], ['bestTime.hard', 'best time, hard', 's'],
+          ['wins.easy', 'wins, easy'], ['wins.normal', 'wins, normal'], ['wins.hard', 'wins, hard']],
+        'breaquot': [['highScore', 'best score'], ['bestLevel', 'best level'], ['games', 'games played']],
+        'hexxaqon': [['wins.hard', 'wins vs hard AI'], ['wins.easy', 'wins vs easy AI'], ['losses.hard', 'losses vs hard AI'],
+          ['losses.easy', 'losses vs easy AI'], ['bestMargin.hard', 'best win margin, hard AI'], ['bestMargin.easy', 'best win margin, easy AI']],
+        'lights-qout': [['stars', 'stars', ' / 48'], ['solved', 'levels solved', ' / 16'], ['randomSolved', 'random puzzles solved']],
+        'qunairo': [['stars', 'stars', ' / 54'], ['solved', 'levels solved', ' / 18'], ['randomSolved', 'random puzzles solved']],
+        'qu2048': [['highScore', 'best score'], ['bestTile', 'best tile'], ['wins', '|2048⟩ reached'], ['mostAnnihilations', 'most annihilations']],
+        'quattleship': [['wins', 'wins'], ['fewestTurns', 'fewest turns to win'], ['losses', 'losses'], ['mostSilent', 'most silent detections']],
+      };
+      const NAMES = { 'quak-man': 'QUAK-MAN', 'quetris': 'QUETRIS', 'minequeeper': 'MINEQUEEPER', 'breaquot': 'BREAQUOT', 'hexxaqon': 'HEXXAQON',
+        'lights-qout': 'LIGHTS QOUT', 'qunairo': 'QUNAIRO', 'qu2048': 'QU2048', 'quattleship': 'QUATTLESHIP' };
+      const fmt = (v, unit) => (unit === 's' ? v + ' s' : v.toLocaleString(window.QA && QA.lang === 'cs' ? 'cs-CZ' : 'en-US') + (unit || ''));
+      const msgEl = document.getElementById('recMsg');
+      let lastMsg = null;
+      const say = (key, vars) => { lastMsg = { key, vars }; msgEl.textContent = t(key, vars); };
+
+      function render() {
+        const all = window.QR ? QR.all() : {};
+        // Card lines.
+        for (const game of Object.keys(SHOW)) {
+          const card = document.querySelector(`a.game[href="${game}/"] .body`);
+          if (!card) continue;
+          let el = card.querySelector('.best');
+          if (!el) { el = document.createElement('span'); el.className = 'best'; card.insertBefore(el, card.querySelector('.play')); }
+          const recs = all[game] || {};
+          const parts = SHOW[game].filter(([k]) => recs[k]).slice(0, 2).map(([k, label, unit]) => `${t(label)}: ${fmt(recs[k].v, unit)}`);
+          el.textContent = parts.length ? '★ ' + parts.join(' · ') : t('no record yet');
+          el.classList.toggle('none', !parts.length);
+        }
+        // Full table.
+        document.getElementById('recGrid').innerHTML = Object.keys(SHOW).map(game => {
+          const recs = all[game] || {};
+          const rows = SHOW[game].filter(([k]) => recs[k]).map(([k, label, unit]) =>
+            `<tr><td>${t(label)}</td><td class="v">${fmt(recs[k].v, unit)}</td><td class="d">${recs[k].at || ''}</td></tr>`).join('');
+          return `<div class="rec-game"><h3>${NAMES[game]}</h3>${rows ? `<table>${rows}</table>` : `<p class="empty">${t('no record yet')}</p>`}</div>`;
+        }).join('');
+        if (lastMsg) msgEl.textContent = t(lastMsg.key, lastMsg.vars);
+      }
+
+      document.getElementById('recExport').addEventListener('click', () => {
+        const blob = new Blob([QR.exportJSON()], { type: 'application/json' });
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = 'quantum-arcade-records.json';
+        document.body.appendChild(a); a.click(); a.remove();
+        setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+        say('Records exported to quantum-arcade-records.json.');
+      });
+      const file = document.getElementById('recFile');
+      document.getElementById('recImport').addEventListener('click', () => file.click());
+      file.addEventListener('change', () => {
+        const f = file.files && file.files[0];
+        if (!f) return;
+        f.text().then(text => {
+          try { const n = QR.importJSON(text); say('Imported. Records improved: {n}.', { n }); render(); }
+          catch (e) { say('That file does not look like an arcade records file.'); }
+          file.value = '';
+        });
+      });
+      document.getElementById('recReset').addEventListener('click', () => {
+        if (!confirm(t('Delete all records stored in this browser? This cannot be undone.'))) return;
+        QR.clear();
+        for (const k of ['quakman-high', 'quetris-high', 'breaquot-high', 'qu2048-best', 'minequeeper-best', 'lightsqout-progress', 'qunairo-progress']) {
+          try { localStorage.removeItem(k); } catch (e) { /* ignore */ }
+        }
+        say('All records deleted.');
+        render();
+      });
+      if (window.QA) QA.onChange(render);
+      window.addEventListener('pageshow', render);
+      render();
+    })();
+  </script>
 </body>
 </html>

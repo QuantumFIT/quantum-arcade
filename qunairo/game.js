@@ -5,6 +5,8 @@
  * the same engine and are stored as compact strings.
  */
 (() => {
+  const GAME_ID = 'qunairo';
+  const rec = (k, v, m) => (window.QR ? QR.set(GAME_ID, k, v, m) : false);
   const E = window.QunairoEngine;
   const t = (s, v) => (window.QA ? QA.t(s, v) : String(s).replace(/\{(\w+)\}/g, (m, k) => (v && k in v ? v[k] : m)));
 
@@ -201,7 +203,10 @@
       const prev = progress[levelIdx];
       if (!prev || stars > prev.stars || (stars === prev.stars && secs < prev.secs)) progress[levelIdx] = { stars, secs };
       save();
-    }
+      const done = Object.values(progress);
+      rec('stars', done.reduce((s, p) => s + p.stars, 0), 'max');
+      rec('solved', done.length, 'max');
+    } else rec('randomSolved', 1, 'add');
     sfx.win();
     setStatus('Solved! Every row and column averages to the centre of the Bloch sphere.', 'win');
     setTimeout(() => { if (won) showOverlay('win', { stars, secs, used }); }, 650);

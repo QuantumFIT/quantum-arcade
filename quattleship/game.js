@@ -5,6 +5,8 @@
  * any number of Zeno probes (paid with energy), then exactly one torpedo.
  */
 (() => {
+  const GAME_ID = 'quattleship';
+  const rec = (k, v, m) => (window.QR ? QR.set(GAME_ID, k, v, m) : false);
   const E = window.QuattleEngine, R = E.RULES, N = E.N;
   const t = (s, v) => (window.QA ? QA.t(s, v) : String(s).replace(/\{(\w+)\}/g, (m, k) => (v && k in v ? v[k] : m)));
   const COLS = 'ABCDEFGH';
@@ -218,6 +220,8 @@
 
   function endGame(won) {
     phase = 'over';
+    rec(won ? 'wins' : 'losses', 1, 'add');
+    if (won) { rec('fewestTurns', turn, 'min'); rec('mostSilent', stats.silent, 'max'); }
     if (won) sfx.win(); else sfx.lose();
     setTimeout(() => showOverlay(won ? 'win' : 'lose', { ...stats, turns: turn }), 700);
     sync();
@@ -407,6 +411,7 @@
       <div class="big" style="color:${kind === 'win' ? '#3ff4ff' : '#ff3b5c'}">${t(kind === 'win' ? 'VICTORY' : 'FLEET LOST')}</div>
       <p>${t(kind === 'win' ? 'The whole enemy fleet is on the bottom.' : 'The enemy sank your whole fleet.')}</p>
       <p>${line}</p>
+      <p>${t('Your record: won {w}, lost {l} · fewest turns to win: {f}', { w: (window.QR && QR.get(GAME_ID, 'wins')) || 0, l: (window.QR && QR.get(GAME_ID, 'losses')) || 0, f: (window.QR && QR.get(GAME_ID, 'fewestTurns')) || '–' })}</p>
       <div class="row"><button class="go" type="button" data-act="new">${t('PLAY AGAIN')}</button>
       <button class="ghostbtn" type="button" data-act="look">${t('SEE THE BOARD')}</button></div>
     </div>`;

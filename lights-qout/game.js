@@ -8,6 +8,8 @@
  * a seeded RNG, so each one is solvable within its par.
  */
 (() => {
+  const GAME_ID = 'lights-qout';
+  const rec = (k, v, m) => (window.QR ? QR.set(GAME_ID, k, v, m) : false);
   const t = (s, v) => (window.QA ? QA.t(s, v) : String(s).replace(/\{(\w+)\}/g, (m, k) => (v && k in v ? v[k] : m)));
 
   const GATES = {
@@ -238,7 +240,10 @@
       const prev = progress[levelIdx];
       if (!prev || stars > prev.stars || (stars === prev.stars && moves < prev.moves)) progress[levelIdx] = { stars, moves };
       saveProgress();
-    }
+      const done = Object.values(progress);
+      rec('stars', done.reduce((s, p) => s + p.stars, 0), 'max');
+      rec('solved', done.length, 'max');
+    } else rec('randomSolved', 1, 'add');
     sfx.win();
     setStatus(moves < par ? 'Under par, nice! {moves} moves (par {par}).' : 'Solved in {moves} moves (par {par}).', 'win', { moves, par });
     setTimeout(() => { if (won) showOverlay('win', { stars, moves, par }); }, 700);

@@ -7,6 +7,8 @@
  * interfere, and the paddle measures any branch that reaches the bottom.
  */
 (() => {
+  const GAME_ID = 'breaquot';
+  const rec = (k, v, m) => (window.QR ? QR.set(GAME_ID, k, v, m) : false);
   const t = (s, v) => (window.QA ? QA.t(s, v) : String(s).replace(/\{(\w+)\}/g, (m, k) => (v && k in v ? v[k] : m)));
   const W = 520, H = 640, COLS = 13, BW = 40, BH = 20, TOP = 64;
   const PY = 596, PH = 10, PW = 86, R = 6;
@@ -337,6 +339,7 @@
     if (lives <= 0) {
       scene = 'gameover';
       try { localStorage.setItem('breaquot-high', String(high)); } catch (e) { /* storage unavailable */ }
+      rec('highScore', score, 'max'); rec('bestLevel', levelIdx + 1, 'max'); rec('games', 1, 'add');
       showOverlay('gameover');
     } else {
       popup(paddle.x, PY - 30, t('COLLAPSED INTO THE VOID'), '#ff6b8b', 1.4);

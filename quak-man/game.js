@@ -6,6 +6,8 @@
  * integer x/y. Grid movers travel from centre to centre towards (tx, ty).
  */
 (() => {
+  const GAME_ID = 'quak-man';
+  const rec = (k, v, m) => (window.QR ? QR.set(GAME_ID, k, v, m) : false);
   const t = (s, v) => (window.QA ? QA.t(s, v) : String(s).replace(/\{(\w+)\}/g, (m, k) => (v && k in v ? v[k] : m)));
 
   // ---------------------------------------------------------------- maze --
@@ -671,6 +673,7 @@
     if (lives <= 0) {
       scene = 'gameover';
       try { localStorage.setItem('quakman-high', String(high)); } catch (e) { /* storage unavailable */ }
+      rec('highScore', score, 'max'); rec('bestLevel', level, 'max'); rec('games', 1, 'add');
       showOverlay('gameover');
       return;
     }

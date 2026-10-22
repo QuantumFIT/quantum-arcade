@@ -8,6 +8,8 @@
  * Revealed numbers show the expected signed mine count of the neighbours.
  */
 (() => {
+  const GAME_ID = 'minequeeper';
+  const rec = (k, v, m) => (window.QR ? QR.set(GAME_ID, k, v, m) : false);
   const t = (s, v) => (window.QA ? QA.t(s, v) : String(s).replace(/\{(\w+)\}/g, (m, k) => (v && k in v ? v[k] : m)));
   const CS = 32;
   const DIFFS = {
@@ -223,6 +225,7 @@
 
   function explode(i) {
     over = true; exploded = i; endT = performance.now();
+    rec('losses.' + diffKey, 1, 'add');
     const c = colOf(i), r = rowOf(i);
     for (let n = 0; n < 40; n++) {
       const a = Math.random() * Math.PI * 2, s = 60 + Math.random() * 220;
@@ -240,6 +243,7 @@
     if (!done) return;
     over = true; won = true; endT = performance.now();
     const secs = Math.floor((endT - startT) / 1000);
+    rec('bestTime.' + diffKey, secs, 'min'); rec('wins.' + diffKey, 1, 'add');
     const prev = best[diffKey];
     if (prev === undefined || secs < prev) {
       best[diffKey] = secs;

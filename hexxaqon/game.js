@@ -8,6 +8,8 @@
  * ghost id g when the piece is one half of a superposition.
  */
 (() => {
+  const GAME_ID = 'hexxaqon';
+  const rec = (k, v, m) => (window.QR ? QR.set(GAME_ID, k, v, m) : false);
   const t = (s, v) => (window.QA ? QA.t(s, v) : String(s).replace(/\{(\w+)\}/g, (m, k) => (v && k in v ? v[k] : m)));
   // A status message: a key plus placeholder values (functions are evaluated
   // when the message is shown, so names follow the current language).
@@ -457,7 +459,12 @@
       const verdict = a === b ? M('Draw, {a}–{b}. Press N for a new game.', v)
         : opp === 'human' ? M('{who} wins, {a}–{b}. Press N for a new game.', { ...v, who: () => name(a > b ? 0 : 1) })
           : a > b ? M('You win, {a}–{b}. Press N for a new game.', v) : M('The AI wins, {a}–{b}. Press N for a new game.', v);
-      setStatus(verdict, a > b || opp === 'human' ? 'win' : 'lose');
+      if (opp !== 'human') {
+        rec((a > b ? 'wins.' : b > a ? 'losses.' : 'draws.') + opp, 1, 'add');
+        if (a > b) rec('bestMargin.' + opp, a - b, 'max');
+        const w = (window.QR && QR.get(GAME_ID, 'wins.' + opp)) || 0, l = (window.QR && QR.get(GAME_ID, 'losses.' + opp)) || 0;
+        setStatus([verdict, M(opp === 'hard' ? 'Your record against the hard AI: won {w}, lost {l}.' : 'Your record against the easy AI: won {w}, lost {l}.', { w, l })], a > b ? 'win' : 'lose');
+      } else setStatus(verdict, 'win');
       if (opp !== 'human' && b > a) sfx.lose(); else sfx.win();
       return;
     }

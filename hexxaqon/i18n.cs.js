@@ -68,4 +68,6 @@ window.QA_CS = {
 
   'SPOOKY': 'STRAŠIDELNÉ',
   'COLLAPSED': 'KOLAPS',
+  'Your record against the easy AI: won {w}, lost {l}.': 'Tvoje bilance proti lehké AI: výhry {w}, prohry {l}.',
+  'Your record against the hard AI: won {w}, lost {l}.': 'Tvoje bilance proti těžké AI: výhry {w}, prohry {l}.',
 };

@@ -18,6 +18,8 @@ Classic computer games rebuilt around quantum mechanics: superposition, phase fl
 
 Each game's page lists its full rules and controls in a side panel.
 
+Personal records (best scores, times, stars, win/loss tallies) are kept per browser and collected under **My records** on the arcade page, which can export and import them as a JSON file. Nothing is sent to a server.
+
 Every page is available in **English and Czech**. Use the CS/EN switch in the top-right corner, or add `?lang=cs` / `?lang=en` to a link.
 
 ## Run locally
@@ -34,7 +36,8 @@ python3 -m http.server 8000   # then open http://localhost:8000
   - Static text is marked with `data-i18n="key"`.
   - Script text goes through `QA.t('English text', {vars})`.
   - `QA.onChange(fn)` lets a page redraw text it generated itself.
-- To add a game, create a new folder, add a card for it to `index.html`, and include its `i18n.cs.js` together with `../i18n.js`.
+- `records.js` stores personal records in `localStorage` (`QR.set(game, key, value, 'max' | 'min' | 'add')`). The arcade page lists them, using the `SHOW` table in `index.html`.
+- To add a game, create a new folder, add a card for it to `index.html`, include its `i18n.cs.js` with `../i18n.js` and `../records.js`, and add its records to `SHOW`.
 
 ## Deploying
 

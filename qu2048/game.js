@@ -8,6 +8,8 @@
  * The rules (slide, canMove, spawn) are pure functions on a 16-cell grid.
  */
 (() => {
+  const GAME_ID = 'qu2048';
+  const rec = (k, v, m) => (window.QR ? QR.set(GAME_ID, k, v, m) : false);
   const t = (s, v) => (window.QA ? QA.t(s, v) : String(s).replace(/\{(\w+)\}/g, (m, k) => (v && k in v ? v[k] : m)));
   const N = 4, WIN_E = 11, UNDOS = 3;
   const DIRS = { left: [0, -1], right: [0, 1], up: [-1, 0], down: [1, 0] };
@@ -190,6 +192,8 @@
     grid = res.grid;
     score += res.gained;
     if (score > best) { best = score; try { localStorage.setItem('qu2048-best', String(best)); } catch (e) { /* ignore */ } }
+    rec('highScore', score, 'max');
+    rec('bestTile', 2 ** Math.max(1, ...grid.map(x => (x && x.kind === 'n' ? x.e : 0))), 'max');
 
     let msg = null;
     for (const ev of res.events) {
@@ -224,10 +228,12 @@
 
     if (!won && grid.some(x => x && x.kind === 'n' && x.e >= WIN_E)) {
       won = true;
+      rec('wins', 1, 'add');
       setTimeout(() => { sfx.win(); showOverlay('win'); }, 300);
     }
     if (!canMove(grid)) {
       over = true;
+      rec('games', 1, 'add'); rec('mostAnnihilations', annihilations, 'max');
       setTimeout(() => { sfx.over(); showOverlay('over'); }, 400);
     }
   }

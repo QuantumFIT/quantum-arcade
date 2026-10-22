@@ -7,6 +7,8 @@
  * entanglement id shared with exactly one other piece.
  */
 (() => {
+  const GAME_ID = 'quetris';
+  const rec = (k, v, m) => (window.QR ? QR.set(GAME_ID, k, v, m) : false);
   const t = (s, v) => (window.QA ? QA.t(s, v) : String(s).replace(/\{(\w+)\}/g, (m, k) => (v && k in v ? v[k] : m)));
 
   // ---------------------------------------------------------- geometry --
@@ -444,6 +446,7 @@
     scene = 'gameover';
     cur = null;
     try { localStorage.setItem('quetris-high', String(high)); } catch (e) { /* storage unavailable */ }
+    rec('highScore', score, 'max'); rec('mostLines', lines, 'max'); rec('bestLevel', level, 'max'); rec('games', 1, 'add');
     sfx.over();
     showOverlay('gameover');
   }

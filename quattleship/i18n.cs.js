@@ -66,4 +66,5 @@ window.QA_CS = {
   'The enemy sank your whole fleet.': 'Nepřítel ti potopil celou flotilu.',
   'PLAY AGAIN': 'HRÁT ZNOVU',
   'SEE THE BOARD': 'UKÁZAT DESKU',
+  'Your record: won {w}, lost {l} · fewest turns to win: {f}': 'Tvoje bilance: výhry {w}, prohry {l} · nejrychlejší výhra: {f} tahů',
 };
